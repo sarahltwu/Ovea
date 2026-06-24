@@ -31,17 +31,28 @@ Budget ~20–30 minutes.
 4. Click **Run**. You should see "Success". This creates posts, comments, votes, reports, the auto-flagging filter, and your moderator access.
 
 ### 1b. Turn on login (Google + email link)
-1. Go to **Authentication → Providers**.
-2. **Email**: make sure it's **enabled** (it usually is). This powers the "email me a link" sign-in. No extra setup.
-3. **Google**: toggle it on. It will ask for a **Client ID** and **Client Secret**. Get these from Google:
-   - Go to **https://console.cloud.google.com** → create a project (or pick one).
-   - **APIs & Services → OAuth consent screen** → set it up (External, add your app name + email).
-   - **APIs & Services → Credentials → Create credentials → OAuth client ID → Web application**.
-   - Under **Authorized redirect URIs**, add the callback URL shown on the Supabase Google provider page (looks like `https://YOUR-PROJECT.supabase.co/auth/v1/callback`).
-   - Copy the generated **Client ID** and **Client Secret** back into Supabase and **Save**.
-4. Go to **Authentication → URL Configuration** and set:
-   - **Site URL**: your live site address (you'll have this after Part 3 — e.g. `https://ovea.pages.dev`). For testing you can temporarily use it once you have it.
-   - **Redirect URLs**: add the same site URL (and `http://localhost:3000` if you test locally with a server).
+
+**Our live values (reuse these exactly):**
+- Supabase callback URL: `https://ltpzbebisvecjhefgfao.supabase.co/auth/v1/callback`
+- Live site URL: `https://ovea.sarahsophiaovea.workers.dev`
+
+1. **Email link** — Authentication → Providers → make sure **Email** is **enabled**. No other setup; powers the "email me a link" button.
+
+2. **Google** — first create credentials in Google Cloud:
+   - **https://console.cloud.google.com** → create/select a project (`Ovea`).
+   - **APIs & Services → OAuth consent screen** → **External** → fill app name `Ovea` + your emails.
+     Click **Publish app** so anyone (not just test users) can sign in.
+   - **APIs & Services → Credentials → Create Credentials → OAuth client ID → Web application**.
+     - **Authorized JavaScript origins:**
+       `https://ovea.sarahsophiaovea.workers.dev` and `https://ltpzbebisvecjhefgfao.supabase.co`
+     - **Authorized redirect URIs** (the Supabase callback, NOT the site):
+       `https://ltpzbebisvecjhefgfao.supabase.co/auth/v1/callback`
+   - Create → copy the **Client ID** + **Client Secret**.
+   - Supabase → Authentication → Providers → **Google** → enable, paste both, **Save**.
+
+3. **Authentication → URL Configuration**:
+   - **Site URL:** `https://ovea.sarahsophiaovea.workers.dev`
+   - **Redirect URLs:** add `https://ovea.sarahsophiaovea.workers.dev/**`
 
 ---
 

@@ -95,9 +95,12 @@ create table if not exists public.posts (
   flag_reason  text,
   hidden       boolean default false,   -- hidden = withheld from public until a moderator approves
   report_count int default 0,
+  author_name  text,                       -- null = posted anonymously; otherwise a display name
   created_at   timestamptz default now()
 );
 alter table public.posts enable row level security;
+-- if the table already existed, add the new column:
+alter table public.posts add column if not exists author_name text;
 
 drop policy if exists "posts read" on public.posts;
 create policy "posts read" on public.posts
@@ -127,9 +130,12 @@ create table if not exists public.comments (
   flag_reason  text,
   hidden       boolean default false,
   report_count int default 0,
+  author_name  text,                       -- null = posted anonymously; otherwise a display name
   created_at   timestamptz default now()
 );
 alter table public.comments enable row level security;
+-- if the table already existed, add the new column:
+alter table public.comments add column if not exists author_name text;
 
 drop policy if exists "comments read" on public.comments;
 create policy "comments read" on public.comments

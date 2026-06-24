@@ -249,7 +249,7 @@
         '<div class="post-main">' +
           '<div class="post-meta">' + flagNote +
             '<span class="pill" data-jump="' + p.community + '">' + esc(CMAP[p.community] || p.community) + "</span>" +
-            "<span>· posted by Anonymous ·</span><span>" + timeAgo(p.created_at) + "</span>" +
+            "<span>· by " + esc(p.author_name || "Anonymous") + " ·</span><span>" + timeAgo(p.created_at) + "</span>" +
           "</div>" +
           '<h3 class="post-title" data-toggle>' + esc(p.title) + "</h3>" +
           (p.body ? '<div class="post-body">' + esc(p.body) + "</div>" : "") +
@@ -296,14 +296,19 @@
     var res = await sb.from("comments").select("*").eq("post_id", postId).order("created_at", { ascending: true });
     var cs = (res.data || []);
     var compose = userId()
-      ? '<div class="c-compose"><textarea placeholder="Add a supportive comment… (anonymous)"></textarea>' +
-        '<button class="btn btn-primary" data-addcomment style="padding:9px 16px;align-self:flex-end">Reply</button></div>'
+      ? '<div class="c-compose"><textarea placeholder="Add a supportive comment…"></textarea>' +
+        '<button class="btn btn-primary" data-addcomment style="padding:9px 16px;align-self:flex-end">Reply</button></div>' +
+        '<div style="display:flex;align-items:center;gap:12px;margin:-6px 0 14px;flex-wrap:wrap">' +
+          '<label style="display:flex;align-items:center;gap:7px;font-size:13px;color:var(--muted);cursor:pointer">' +
+          '<input type="checkbox" data-canon checked style="width:15px;height:15px;accent-color:var(--plum)" /> Comment anonymously</label>' +
+          '<input type="text" data-cname maxlength="30" placeholder="Display name" style="display:none;padding:7px 11px;border:1.5px solid var(--line);border-radius:9px;font-family:var(--font);font-size:13px;background:var(--cream)" />' +
+        "</div>"
       : '<div style="margin-bottom:12px"><button class="btn btn-ghost" data-needauth style="padding:9px 16px">Sign in to comment</button></div>';
     var list = cs.map(function (c) {
       var mine = userId() && c.user_id === userId();
       var note = (c.hidden || c.flagged) && (mine || window.OVEA_IS_ADMIN) ? '<span class="flag-note">' + (c.hidden ? "Hidden — under review" : "Flagged") + "</span> " : "";
       return '<div class="comment' + (mine ? " mine" : "") + '">' +
-        '<div class="c-by">' + note + "<b>Anonymous</b> · " + timeAgo(c.created_at) + "</div>" +
+        '<div class="c-by">' + note + "<b>" + esc(c.author_name || "Anonymous") + "</b> · " + timeAgo(c.created_at) + "</div>" +
         '<div class="c-text">' + esc(c.body) + "</div></div>";
     }).join("");
     box.innerHTML = compose + (list || '<div style="color:var(--muted);font-size:13px">No comments yet — be the first.</div>');
@@ -313,8 +318,12 @@
     var ta = article.querySelector("[data-comments] textarea");
     var text = ta.value.trim();
     if (!text) return;
+    var anonBox = article.querySelector("[data-comments] [data-canon]");
+    var nameBox = article.querySelector("[data-comments] [data-cname]");
+    var anon = !anonBox || anonBox.checked;
+    var authorName = anon ? null : ((nameBox && nameBox.value.trim()) || "Member");
     ta.disabled = true;
-    var res = await sb.from("comments").insert({ post_id: postId, user_id: userId(), body: text });
+    var res = await sb.from("comments").insert({ post_id: postId, user_id: userId(), body: text, author_name: authorName });
     ta.disabled = false;
     if (res.error) { alert("Couldn't post comment: " + res.error.message); return; }
     await loadComments(article, postId);
@@ -378,6 +387,11 @@
         else { box.classList.add("open"); loadComments(article, id); }
         return;
       }
+      if (e.target.closest("[data-canon]")) {
+        var nm = article.querySelector("[data-comments] [data-cname]");
+        if (nm) nm.style.display = e.target.checked ? "none" : "";
+        return;
+      }
       if (e.target.closest("[data-addcomment]")) { addComment(article, id); return; }
       if (e.target.closest("[data-needauth]")) { openAuth(); return; }
       if (e.target.closest("[data-report]")) { reportContent("post", id); return; }
@@ -402,18 +416,28 @@
     var cancel = document.getElementById("composerCancel");
     if (cancel) cancel.addEventListener("click", function () { composerForm.classList.remove("open"); });
 
+    // show/hide the display-name field based on the "post anonymously" checkbox
+    var postAnon = document.getElementById("postAnon");
+    var postName = document.getElementById("postName");
+    if (postAnon && postName) postAnon.addEventListener("change", function () {
+      postName.style.display = postAnon.checked ? "none" : "";
+    });
+
     if (composerForm) composerForm.addEventListener("submit", async function (e) {
       e.preventDefault();
       if (!userId()) return openAuth();
       var title = document.getElementById("postTitle").value.trim();
       var body = document.getElementById("postBody").value.trim();
       var community = document.getElementById("postCommunity").value;
+      var anon = document.getElementById("postAnon").checked;
+      var authorName = anon ? null : (document.getElementById("postName").value.trim() || "Member");
       if (!title) return;
-      var res = await sb.from("posts").insert({ user_id: userId(), community: community, title: title, body: body }).select().single();
+      var res = await sb.from("posts").insert({ user_id: userId(), community: community, title: title, body: body, author_name: authorName }).select().single();
       if (res.error) { alert("Couldn't post: " + res.error.message); return; }
       // author auto-upvote
       if (res.data) { await sb.from("votes").upsert({ user_id: userId(), post_id: res.data.id, value: 1 }); myVotes[res.data.id] = 1; }
       composerForm.reset();
+      if (postName) postName.style.display = "none";
       composerForm.classList.remove("open");
       if (res.data && res.data.hidden) {
         alert("Your post mentions language our filter caught, so it's hidden until a moderator reviews it.");
