@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ovea — Where women speak up</title>
+  <meta name="description" content="Ovea is a safe, anonymous community where women share, ask, vote, and support each other. Speak up freely." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='%236d2e5b'/></svg>" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap nav" style="max-width:1240px">
+      <a class="brand" href="index.html"><span class="mark"></span><span class="name">Ovea</span></a>
+      <div class="nav-search">
+        <input type="text" id="navSearch" placeholder="Search posts and communities…" aria-label="Search" />
+      </div>
+      <nav class="nav-links" id="navLinks">
+        <a href="index.html" class="active">Home</a>
+        <a href="resources.html">Health Info</a>
+        <a href="support.html">Get Help</a>
+        <a href="about.html">About</a>
+        <button class="nav-cta" id="createBtn" style="border:0;cursor:pointer;font-family:inherit">Create post</button>
+        <span id="accountArea"></span>
+      </nav>
+      <button class="nav-toggle" id="navToggle" aria-label="Menu">☰</button>
+    </div>
+  </header>
+
+  <main class="app-shell">
+    <!-- LEFT RAIL: communities -->
+    <aside class="left-rail">
+      <div class="rail-sticky">
+        <div class="rail-card">
+          <h4>Feeds</h4>
+          <button class="c-item active" data-community="all"><span class="c-dot" style="background:linear-gradient(135deg,#e8909c,#6d2e5b)"></span><span class="c-meta"><span class="c-name">Home</span><span class="c-count">All communities</span></span></button>
+          <button class="c-item" data-community="popular"><span class="c-dot" style="background:linear-gradient(135deg,#f0b27a,#b8456a)"></span><span class="c-meta"><span class="c-name">Popular</span><span class="c-count">Top right now</span></span></button>
+        </div>
+        <div class="rail-card" id="communityList">
+          <h4>Communities</h4>
+          <!-- filled by JS -->
+        </div>
+      </div>
+    </aside>
+
+    <!-- CENTER: feed -->
+    <section class="feed">
+      <div class="safe-banner">
+        <b>This is a safe space.</b> You're anonymous here. Be kind, support each other, and speak freely — every post is moderated to keep it that way.
+      </div>
+
+      <!-- Composer -->
+      <div class="composer" id="composer">
+        <div class="prompt">
+          <span class="avatar"></span>
+          <input type="text" id="composerOpen" placeholder="Share something, ask a question, or speak your mind…" readonly />
+        </div>
+        <form class="composer-form" id="composerForm">
+          <div class="row">
+            <select id="postCommunity" required></select>
+          </div>
+          <div class="row">
+            <input class="title" type="text" id="postTitle" maxlength="140" placeholder="Title — what's this about?" required />
+          </div>
+          <div class="row">
+            <textarea id="postBody" maxlength="2000" placeholder="Add more detail (optional). Don't share anything that identifies you."></textarea>
+          </div>
+          <div class="composer-actions">
+            <span class="note">Posts are anonymous and reviewed by a moderator.</span>
+            <div style="display:flex;gap:8px">
+              <button type="button" class="btn btn-ghost" id="composerCancel" style="padding:9px 16px">Cancel</button>
+              <button type="submit" class="btn btn-primary" style="padding:9px 18px">Post</button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- Sort bar -->
+      <div class="feed-head">
+        <span class="feed-title" id="feedTitle">Home</span>
+        <button class="sort-tab active" data-sort="hot">Hot</button>
+        <button class="sort-tab" data-sort="new">New</button>
+        <button class="sort-tab" data-sort="top">Top</button>
+      </div>
+
+      <!-- Posts -->
+      <div id="feed"></div>
+    </section>
+
+    <!-- RIGHT RAIL -->
+    <aside class="right-rail">
+      <div class="rail-sticky">
+        <div class="rail-card">
+          <h3>Welcome to Ovea</h3>
+          <p>A community by women, for women — a place to speak up about anything, anonymously and safely.</p>
+          <p style="margin-bottom:0">No real names. No judgment. Just real talk and real support.</p>
+        </div>
+        <div class="rail-card">
+          <h3>Community rules</h3>
+          <div class="rule"><b>1.</b><span>Be kind and respect every woman's experience.</span></div>
+          <div class="rule"><b>2.</b><span>Stay anonymous — never share info that identifies you or others.</span></div>
+          <div class="rule"><b>3.</b><span>No hate, harassment, or bullying. Ever.</span></div>
+          <div class="rule"><b>4.</b><span>Support, don't diagnose. Share experience, not medical orders.</span></div>
+          <div class="rule"><b>5.</b><span>In crisis? Visit <a href="support.html" style="color:var(--plum);font-weight:600">Get Help</a> right away.</span></div>
+        </div>
+        <div class="rail-card">
+          <h3>Trending</h3>
+          <div class="tag-cloud" id="trending"></div>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Sign-in modal -->
+  <div class="modal-overlay" id="authModal">
+    <div class="auth-box">
+      <button class="close" id="authClose" aria-label="Close">×</button>
+      <div class="mark-lg"></div>
+      <h2>Join Ovea</h2>
+      <p class="sub">Sign in to post, comment, and vote — anonymously to everyone else.</p>
+      <button class="auth-btn" id="googleBtn">
+        <svg class="g" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.4 29.2 35 24 35c-6.1 0-11-4.9-11-11s4.9-11 11-11c2.8 0 5.4 1.1 7.4 2.8l5.7-5.7C33.5 6.5 28.1 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20c11 0 19.5-8 19.5-20 0-1.2-.1-2.3-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 16 19 13 24 13c2.8 0 5.4 1.1 7.4 2.8l5.7-5.7C33.5 6.5 28.1 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35 26.7 36 24 36c-5.2 0-9.6-3.3-11.2-7.9l-6.5 5C9.6 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.1-4.1 5.6l6.2 5.2C41.1 36.1 44 30.6 44 24c0-1.2-.1-2.3-.4-3.5z"/></svg>
+        Continue with Google
+      </button>
+      <div class="auth-divider">or</div>
+      <form class="auth-email" id="emailForm">
+        <input type="email" id="emailInput" placeholder="you@example.com" required />
+        <button class="btn btn-primary" type="submit" style="width:100%;justify-content:center">Email me a sign-in link</button>
+      </form>
+      <div class="auth-msg" id="authMsg"></div>
+      <p class="auth-fine">You're anonymous to other members — your name and email are never shown publicly. By joining you agree to keep this a kind, safe space. Be 16+.</p>
+    </div>
+  </div>
+
+  <div id="footer"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="ovea-app.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

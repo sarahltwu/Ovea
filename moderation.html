@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Moderation — Ovea</title>
+  <meta name="robots" content="noindex" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='%236d2e5b'/></svg>" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap nav" style="max-width:1240px">
+      <a class="brand" href="index.html"><span class="mark"></span><span class="name">Ovea</span></a>
+      <nav class="nav-links" id="navLinks">
+        <a href="index.html">Home</a>
+        <a href="moderation.html" class="active">Moderation</a>
+        <span id="accountArea"></span>
+      </nav>
+      <button class="nav-toggle" id="navToggle" aria-label="Menu">☰</button>
+    </div>
+  </header>
+
+  <main id="modRoot" style="min-height:60vh"></main>
+
+  <!-- Sign-in modal (shared) -->
+  <div class="modal-overlay" id="authModal">
+    <div class="auth-box">
+      <button class="close" id="authClose" aria-label="Close">×</button>
+      <div class="mark-lg"></div>
+      <h2>Moderator sign-in</h2>
+      <p class="sub">Sign in with your moderator account.</p>
+      <button class="auth-btn" id="googleBtn">
+        <svg class="g" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.4 29.2 35 24 35c-6.1 0-11-4.9-11-11s4.9-11 11-11c2.8 0 5.4 1.1 7.4 2.8l5.7-5.7C33.5 6.5 28.1 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20c11 0 19.5-8 19.5-20 0-1.2-.1-2.3-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 16 19 13 24 13c2.8 0 5.4 1.1 7.4 2.8l5.7-5.7C33.5 6.5 28.1 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35 26.7 36 24 36c-5.2 0-9.6-3.3-11.2-7.9l-6.5 5C9.6 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.1-4.1 5.6l6.2 5.2C41.1 36.1 44 30.6 44 24c0-1.2-.1-2.3-.4-3.5z"/></svg>
+        Continue with Google
+      </button>
+      <div class="auth-divider">or</div>
+      <form class="auth-email" id="emailForm">
+        <input type="email" id="emailInput" placeholder="you@example.com" required />
+        <button class="btn btn-primary" type="submit" style="width:100%;justify-content:center">Email me a sign-in link</button>
+      </form>
+      <div class="auth-msg" id="authMsg"></div>
+    </div>
+  </div>
+
+  <div id="footer"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="ovea-app.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+# OS junk
+.DS_Store
+Thumbs.db
+
+# editor
+.vscode/
+.idea/
+
+# logs / deps (not used now, but safe)
+node_modules/
+*.log
+
+# NOTE: supabase-config.js IS committed on purpose.
+# It only contains the public "anon" key, which is safe to expose.
+# Never commit the service_role key.

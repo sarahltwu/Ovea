@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Donate — Ovea</title>
+  <meta name="description" content="Support Ovea's mission to provide free women's health education and community. Your donation keeps our resources free." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='%236d2e5b'/></svg>" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap nav">
+      <a class="brand" href="index.html"><span class="mark"></span><span class="name">Ovea</span></a>
+      <nav class="nav-links" id="navLinks">
+        <a href="index.html">Home</a>
+        <a href="resources.html">Health Info</a>
+        <a href="support.html">Get Help</a>
+        <a href="about.html">About</a>
+        <a href="index.html" class="nav-cta">Open community</a>
+      </nav>
+      <button class="nav-toggle" id="navToggle" aria-label="Menu">☰</button>
+    </div>
+  </header>
+
+  <section class="page-hero">
+    <div class="wrap reveal">
+      <h1>Support Our Mission</h1>
+      <p>Ovea is a nonprofit. Everything we offer is free — and donations are what keep it that way.</p>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:24px">
+    <div class="wrap" style="max-width:880px">
+      <div class="prose reveal" style="margin-bottom:40px">
+        <p>Millions of women and girls lack access to accurate health information and a safe place to ask questions. Ovea exists to close that gap — with free, expert-reviewed education and an anonymous, moderated community open to anyone.</p>
+        <p>We don't sell ads or data. Our work is funded entirely by people who believe every woman deserves to understand her own body and health. <strong>100% of donations</strong> go to running the platform, paying our moderators and medical reviewers, and supporting our partner charities below.</p>
+      </div>
+
+      <h2 style="font-family:var(--serif);color:var(--plum-deep);font-size:24px;text-align:center;margin-bottom:8px" class="reveal">Choose an amount</h2>
+      <p style="text-align:center;color:var(--muted);margin-bottom:24px" class="reveal">Every gift, big or small, makes a difference.</p>
+
+      <div class="donate-box reveal">
+        <div class="tiers" id="tiers">
+          <div class="tier" data-amt="10"><div class="amt">$10</div><div class="impact">Reviews one new health article</div></div>
+          <div class="tier active" data-amt="25"><div class="amt">$25</div><div class="impact">Funds a week of moderation</div></div>
+          <div class="tier" data-amt="50"><div class="amt">$50</div><div class="impact">Hosts one expert event</div></div>
+          <div class="tier" data-amt="100"><div class="amt">$100</div><div class="impact">Supports 1,000 readers</div></div>
+        </div>
+        <form id="donateForm" style="margin-top:24px">
+          <div class="field">
+            <label for="customAmt">Or enter a custom amount (USD)</label>
+            <input type="number" id="customAmt" min="1" step="1" placeholder="e.g. 35" />
+          </div>
+          <div class="field">
+            <label for="donateFreq">Frequency</label>
+            <select id="donateFreq">
+              <option value="once">One-time</option>
+              <option value="monthly">Monthly</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" type="submit" style="width:100%;justify-content:center">Donate <span id="donateAmtLabel">$25</span></button>
+          <div class="form-msg" id="donateMsg"></div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <section class="section tinted">
+    <div class="wrap" style="max-width:960px">
+      <div class="section-head reveal">
+        <span class="eyebrow">Where it goes</span>
+        <h2>Charities we support</h2>
+        <p>A share of every donation goes to organizations advancing women's and girls' health worldwide.</p>
+      </div>
+      <div class="grid-2">
+        <div class="support-card reveal">
+          <h3>Global Girls' Health Fund</h3>
+          <p>Provides menstrual products and health education to girls in under-resourced schools.</p>
+          <div class="line" style="color:var(--sage)">25% of donations</div>
+        </div>
+        <div class="support-card reveal">
+          <h3>Maternal Care Alliance</h3>
+          <p>Supports safe pregnancy and childbirth care for mothers in low-income communities.</p>
+          <div class="line" style="color:var(--sage)">20% of donations</div>
+        </div>
+        <div class="support-card reveal">
+          <h3>Women's Mental Health Network</h3>
+          <p>Funds free counseling and crisis support for women facing mental health challenges.</p>
+          <div class="line" style="color:var(--sage)">15% of donations</div>
+        </div>
+        <div class="support-card reveal">
+          <h3>Ovea Platform &amp; Programs</h3>
+          <p>Keeps our resources free, our community moderated, and our events open to all.</p>
+          <div class="line" style="color:var(--sage)">40% of donations</div>
+        </div>
+      </div>
+      <div class="notice reveal" style="margin-top:30px">
+        <div>Ovea is a registered nonprofit. Donations may be tax-deductible where applicable. This is a demo donation form — no payment is processed.</div>
+      </div>
+    </div>
+  </section>
+
+  <div id="footer"></div>
+  <script src="script.js"></script>
+</body>
+</html>
