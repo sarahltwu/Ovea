@@ -66,22 +66,46 @@ Budget ~20–30 minutes.
 
 Login can't work from a file on your computer — it needs a real `https://` address.
 
-**Cloudflare Pages — drag-and-drop**
+We host the code on **GitHub**, then connect **Cloudflare Pages** to that repo so every
+push auto-deploys. The project is already a git repo with one commit.
+
+### 3a. Put the code on GitHub
+1. Go to **https://github.com/new** and create a repo named **`ovea`**. Leave it empty
+   (no README, no .gitignore — this project already has them). You can make it Public or Private.
+2. Copy the repo URL GitHub shows you (e.g. `https://github.com/YOUR-USERNAME/ovea.git`).
+3. In a terminal, from the `Ovea` folder, run:
+   ```bash
+   git remote add origin https://github.com/YOUR-USERNAME/ovea.git
+   git push -u origin main
+   ```
+   GitHub will ask you to sign in (a browser prompt or a Personal Access Token). After this,
+   your code is on GitHub.
+
+   > Later, to publish any change: `git add -A && git commit -m "update" && git push`
+
+### 3b. Connect Cloudflare Pages to GitHub
 1. Go to **https://dash.cloudflare.com** → sign up (free).
-2. In the left sidebar, click **Workers & Pages** → **Create** → **Pages** tab → **Upload assets**.
-3. Give the project a name (e.g. `ovea`). This becomes part of your URL.
-4. **Drag the whole `Ovea` folder** (or select all the files inside it) into the upload box → **Deploy site**.
-5. You'll get a URL like `https://ovea.pages.dev`.
-6. Go back to **Supabase → Authentication → URL Configuration** and set:
-   - **Site URL** = your Cloudflare URL (e.g. `https://ovea.pages.dev`)
-   - **Redirect URLs** = the same URL. Save.
-7. (If you set up Google login, also add that URL to the Google Cloud **Authorized redirect URIs**.)
+2. **Workers & Pages** → **Create** → **Pages** tab → **Connect to Git**.
+3. Authorize Cloudflare to access GitHub, then pick your **`ovea`** repo.
+4. Build settings — this is a plain static site, so:
+   - **Framework preset:** `None`
+   - **Build command:** *(leave empty)*
+   - **Build output directory:** `/`  (just a slash — the files are in the repo root)
+5. **Save and Deploy.** You'll get a URL like `https://ovea.pages.dev`.
+
+Every future `git push` to `main` now redeploys automatically.
+
+### 3c. Point Supabase at your live URL (required for login)
+**Supabase → Authentication → URL Configuration**:
+- **Site URL** = your Cloudflare URL (e.g. `https://ovea.pages.dev`)
+- **Redirect URLs** = the same URL. Save.
+
+(If you set up Google login, also add that URL to the Google Cloud **Authorized redirect URIs**.)
 
 That's it — open your `.pages.dev` URL and sign in.
 
-> To update the site later, come back to the same Pages project → **Create deployment** → drag the folder again. (Or connect a GitHub repo for automatic deploys on every push.)
-
-> Want a custom domain (e.g. `ovea.org`)? In your Pages project → **Custom domains** → add it, then update the Supabase Site URL + Redirect URLs to match.
+> Want a custom domain (e.g. `ovea.org`)? In your Pages project → **Custom domains** → add it,
+> then update the Supabase Site URL + Redirect URLs to match.
 
 ---
 
