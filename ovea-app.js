@@ -9,16 +9,15 @@
 
   /* ---------- Communities (static catalog) ---------- */
   var COMMUNITIES = [
-    { id: "periods",       name: "Periods & Cycles",      count: "" },
-    { id: "mental",        name: "Mental Health",         count: "" },
-    { id: "relationships", name: "Relationships",         count: "" },
-    { id: "pregnancy",     name: "Pregnancy & Parenting", count: "" },
-    { id: "body",          name: "Body & Hygiene",        count: "" },
-    { id: "menopause",     name: "Menopause",             count: "" },
-    { id: "work",          name: "Work & Money",          count: "" },
-    { id: "safety",        name: "Safety & Support",      count: "" },
-    { id: "venting",       name: "Just Venting",          count: "" },
-    { id: "wins",          name: "Small Wins",            count: "" }
+    { id: "periods",       name: "Periods & Cycles",        count: "" },
+    { id: "body",          name: "Body & Puberty",          count: "" },
+    { id: "mental",        name: "Mental Health",           count: "" },
+    { id: "confidence",    name: "Body Image & Confidence", count: "" },
+    { id: "relationships", name: "Friends & Relationships", count: "" },
+    { id: "school",        name: "School & Stress",         count: "" },
+    { id: "safety",        name: "Safety & Support",        count: "" },
+    { id: "venting",       name: "Just Venting",            count: "" },
+    { id: "wins",          name: "Small Wins",              count: "" }
   ];
   var CMAP = {};
   COMMUNITIES.forEach(function (c) { CMAP[c.id] = c.name; });
@@ -173,7 +172,7 @@
   function renderTrending() {
     var el = document.getElementById("trending");
     if (!el) return;
-    var tags = ["Speaking up", "Boundaries", "Self-care", "Small wins", "Perimenopause", "Trust your gut"];
+    var tags = ["Speaking up", "First period", "Friendship", "Exam stress", "Self-care", "Small wins", "Trust your gut"];
     el.innerHTML = tags.map(function (t) { return '<span class="t">#' + esc(t.replace(/\s/g, "")) + "</span>"; }).join("");
   }
 
