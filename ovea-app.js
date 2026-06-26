@@ -1,5 +1,5 @@
 /* ============================================================
-   Ovea — community app (Supabase-powered)
+   Ovea, community app (Supabase-powered)
    Handles: auth (Google + email magic link), live feed, voting,
    comments, reporting, and the moderation queue.
    Loaded on: index.html (feed) and moderation.html (admin).
@@ -107,7 +107,7 @@
 
     var googleBtn = document.getElementById("googleBtn");
     if (googleBtn) googleBtn.addEventListener("click", function () {
-      if (!configured) return setAuthMsg("Supabase isn't configured yet — see SETUP.md.", "err");
+      if (!configured) return setAuthMsg("Supabase isn't configured yet, see SETUP.md.", "err");
       sb.auth.signInWithOAuth({
         provider: "google",
         options: { redirectTo: window.location.origin + window.location.pathname }
@@ -117,7 +117,7 @@
     var emailForm = document.getElementById("emailForm");
     if (emailForm) emailForm.addEventListener("submit", function (e) {
       e.preventDefault();
-      if (!configured) return setAuthMsg("Supabase isn't configured yet — see SETUP.md.", "err");
+      if (!configured) return setAuthMsg("Supabase isn't configured yet, see SETUP.md.", "err");
       var email = document.getElementById("emailInput").value.trim();
       if (!email) return;
       setAuthMsg("Sending your link…", "ok");
@@ -126,7 +126,7 @@
         options: { emailRedirectTo: window.location.origin + window.location.pathname }
       }).then(function (res) {
         if (res.error) setAuthMsg(res.error.message, "err");
-        else setAuthMsg("Check your inbox — we sent you a sign-in link.", "ok");
+        else setAuthMsg("Check your inbox, we sent you a sign-in link.", "ok");
       });
     });
   }
@@ -169,11 +169,50 @@
       return '<option value="' + c.id + '">' + esc(c.name) + "</option>";
     }).join("");
   }
-  function renderTrending() {
+  // Words too common to be interesting as a trend
+  var STOP = ("the a an and or but if then of to in on at for with about from into "
+    + "is am are was were be been being do does did doing have has had i you he she it we they "
+    + "me my mine your yours his her hers our their them us this that these those there here "
+    + "not no yes so just like really very too also still even much more most some any all "
+    + "im ive its dont cant wont didnt doesnt am pm get got out up down off over "
+    + "can could would should will shall may might must want need know think feel feeling felt "
+    + "what when where why how who which whom whose because as than then now today day days "
+    + "time times people someone anyone everyone something anything nothing thing things "
+    + "go going went come came back one two her she help please thanks thank").split(/\s+/);
+  var STOPSET = {};
+  STOP.forEach(function (w) { STOPSET[w] = true; });
+
+  async function renderTrending() {
     var el = document.getElementById("trending");
     if (!el) return;
-    var tags = ["Speaking up", "First period", "Friendship", "Exam stress", "Self-care", "Small wins", "Trust your gut"];
-    el.innerHTML = tags.map(function (t) { return '<span class="t">#' + esc(t.replace(/\s/g, "")) + "</span>"; }).join("");
+    var card = el.closest(".rail-card");
+    if (!configured) { if (card) card.style.display = "none"; return; }
+
+    var res = await sb.from("posts").select("title,body").order("created_at", { ascending: false }).limit(200);
+    var posts = res.data || [];
+    var counts = {};
+    posts.forEach(function (p) {
+      var words = ((p.title || "") + " " + (p.body || "")).toLowerCase().match(/[a-z][a-z']{2,}/g) || [];
+      var seen = {};
+      words.forEach(function (w) {
+        w = w.replace(/'/g, "");
+        if (w.length < 3 || STOPSET[w] || seen[w]) return;
+        seen[w] = true;                 // count each word once per post
+        counts[w] = (counts[w] || 0) + 1;
+      });
+    });
+    var top = Object.keys(counts)
+      .filter(function (w) { return counts[w] >= 2; })   // must appear in 2+ posts to "trend"
+      .sort(function (a, b) { return counts[b] - counts[a]; })
+      .slice(0, 8);
+
+    if (!top.length) {
+      // nothing trending yet, show communities to explore instead of making things up
+      if (card) card.style.display = "none";
+      return;
+    }
+    if (card) card.style.display = "";
+    el.innerHTML = top.map(function (w) { return '<span class="t">#' + esc(w) + "</span>"; }).join("");
   }
 
   async function loadMyVotes() {
@@ -190,7 +229,7 @@
     if (!configured) {
       feed.innerHTML =
         '<div class="config-banner"><b>Almost there.</b> Connect Supabase to turn on real accounts and live posts. ' +
-        'Add your keys in <code>supabase-config.js</code> and run <code>supabase/schema.sql</code> — full steps in <code>SETUP.md</code>.</div>' +
+        'Add your keys in <code>supabase-config.js</code> and run <code>supabase/schema.sql</code>, full steps in <code>SETUP.md</code>.</div>' +
         '<div class="feed-empty">The community feed will appear here once Supabase is connected.</div>';
       return;
     }
@@ -237,7 +276,7 @@
     var mine = userId() && p.user_id === userId();
     var mv = myVotes[p.id] || 0;
     var flagNote = (p.hidden || p.flagged) && (mine || window.OVEA_IS_ADMIN)
-      ? '<span class="flag-note">' + (p.hidden ? "Hidden — under review" : "Flagged") + "</span> " : "";
+      ? '<span class="flag-note">' + (p.hidden ? "Hidden, under review" : "Flagged") + "</span> " : "";
     return (
       '<article class="post' + (mine ? " mine" : "") + '" data-id="' + p.id + '">' +
         '<div class="vote-col">' +
@@ -305,12 +344,12 @@
       : '<div style="margin-bottom:12px"><button class="btn btn-ghost" data-needauth style="padding:9px 16px">Sign in to comment</button></div>';
     var list = cs.map(function (c) {
       var mine = userId() && c.user_id === userId();
-      var note = (c.hidden || c.flagged) && (mine || window.OVEA_IS_ADMIN) ? '<span class="flag-note">' + (c.hidden ? "Hidden — under review" : "Flagged") + "</span> " : "";
+      var note = (c.hidden || c.flagged) && (mine || window.OVEA_IS_ADMIN) ? '<span class="flag-note">' + (c.hidden ? "Hidden, under review" : "Flagged") + "</span> " : "";
       return '<div class="comment' + (mine ? " mine" : "") + '">' +
         '<div class="c-by">' + note + "<b>" + esc(c.author_name || "Anonymous") + "</b> · " + timeAgo(c.created_at) + "</div>" +
         '<div class="c-text">' + esc(c.body) + "</div></div>";
     }).join("");
-    box.innerHTML = compose + (list || '<div style="color:var(--muted);font-size:13px">No comments yet — be the first.</div>');
+    box.innerHTML = compose + (list || '<div style="color:var(--muted);font-size:13px">No comments yet, be the first.</div>');
   }
 
   async function addComment(article, postId) {
@@ -444,6 +483,7 @@
       state.sort = "new";
       document.querySelectorAll(".sort-tab").forEach(function (t) { t.classList.toggle("active", t.getAttribute("data-sort") === "new"); });
       await loadFeed();
+      renderTrending();
       window.scrollTo({ top: 220, behavior: "smooth" });
     });
 

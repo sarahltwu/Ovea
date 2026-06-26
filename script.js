@@ -1,5 +1,5 @@
 /* ============================================================
-   Ovea — shared site logic (footer, nav, and static pages)
+   Ovea, shared site logic (footer, nav, and static pages)
    The community feed + auth lives in ovea-app.js (Supabase).
    ============================================================ */
 (function () {
@@ -54,7 +54,7 @@
       e.preventDefault();
       var msg = document.getElementById("newsMsg");
       if (!document.getElementById("newsEmail").value.trim()) return;
-      msg.textContent = "Thank you for subscribing — welcome to the Ovea community!";
+      msg.textContent = "Thank you for subscribing, welcome to the Ovea community!";
       form.reset();
     });
   }
@@ -66,9 +66,9 @@
     if (!list) return;
     q = (q || "").trim().toLowerCase();
     var groups = list.querySelectorAll(".res-group");
-    var links = list.querySelectorAll(".res-link");
+    var items = list.querySelectorAll(".res-item");
     var anyShown = false;
-    links.forEach(function (a) {
+    items.forEach(function (a) {
       var hay = (a.textContent + " " + (a.getAttribute("data-topic") || "")).toLowerCase();
       var show = !q || hay.indexOf(q) !== -1;
       a.style.display = show ? "" : "none";
@@ -76,7 +76,7 @@
     });
     groups.forEach(function (g) {
       var sib = g.nextElementSibling, visible = false;
-      while (sib && sib.classList.contains("res-link")) {
+      while (sib && sib.classList.contains("res-item")) {
         if (sib.style.display !== "none") visible = true;
         sib = sib.nextElementSibling;
       }
@@ -130,7 +130,7 @@
       }
       form.reset();
       msg.className = "form-msg ok";
-      msg.textContent = "Thank you! Your feedback has been received — we read every message.";
+      msg.textContent = "Thank you! Your feedback has been received, we read every message.";
     });
   }
 
@@ -169,7 +169,7 @@
       msg.className = "form-msg ok";
       msg.textContent = "Thank you for your generosity! Your $" + amt +
         (freq && freq.value === "monthly" ? " each month" : "") +
-        " gift helps keep Ovea free and safe. (Demo — no payment taken.)";
+        " gift helps keep Ovea free and safe. (Demo, no payment taken.)";
       e.target.reset();
       updateLabel();
     });

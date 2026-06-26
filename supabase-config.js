@@ -1,9 +1,9 @@
 /* ============================================================
-   Ovea — Supabase configuration
+   Ovea, Supabase configuration
    ------------------------------------------------------------
    Fill these in with YOUR project's values from:
      Supabase Dashboard → Project Settings → API
-   The "anon public" key is safe to expose in the browser — your
+   The "anon public" key is safe to expose in the browser, your
    data is protected by Row Level Security (see supabase/schema.sql).
    ============================================================ */
 window.OVEA_CONFIG = {
