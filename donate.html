@@ -45,22 +45,15 @@
 
       <div class="donate-box reveal">
         <div class="tiers" id="tiers">
-          <div class="tier" data-amt="10"><div class="amt">$10</div><div class="impact">Reviews one new health article</div></div>
-          <div class="tier active" data-amt="25"><div class="amt">$25</div><div class="impact">Funds a week of moderation</div></div>
-          <div class="tier" data-amt="50"><div class="amt">$50</div><div class="impact">Hosts one expert event</div></div>
-          <div class="tier" data-amt="100"><div class="amt">$100</div><div class="impact">Supports 1,000 readers</div></div>
+          <div class="tier" data-amt="10"><div class="amt">$10</div></div>
+          <div class="tier active" data-amt="25"><div class="amt">$25</div></div>
+          <div class="tier" data-amt="50"><div class="amt">$50</div></div>
+          <div class="tier" data-amt="100"><div class="amt">$100</div></div>
         </div>
         <form id="donateForm" style="margin-top:24px">
           <div class="field">
             <label for="customAmt">Or enter a custom amount (USD)</label>
             <input type="number" id="customAmt" min="1" step="1" placeholder="e.g. 35" />
-          </div>
-          <div class="field">
-            <label for="donateFreq">Frequency</label>
-            <select id="donateFreq">
-              <option value="once">One-time</option>
-              <option value="monthly">Monthly</option>
-            </select>
           </div>
           <button class="btn btn-primary" type="submit" style="width:100%;justify-content:center">Donate <span id="donateAmtLabel">$25</span></button>
           <div class="form-msg" id="donateMsg"></div>
@@ -99,12 +92,15 @@
         </div>
       </div>
       <div class="notice reveal" style="margin-top:30px">
-        <div>Ovea is a registered nonprofit. Donations may be tax-deductible where applicable. This is a demo donation form, no payment is processed.</div>
+        <div>Payments are handled securely by PayPal. Ovea is a student-led project supporting girls' and women's health, thank you for helping keep it free.</div>
       </div>
     </div>
   </section>
 
   <div id="footer"></div>
+
+  <!-- Donations: put your PayPal.me username between the quotes (from paypal.me/USERNAME) -->
+  <script>window.OVEA_PAYPAL = "";</script>
   <script src="script.js"></script>
 </body>
 </html>

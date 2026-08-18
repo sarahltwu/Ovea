@@ -166,12 +166,16 @@
       var amt = custom.value ? Number(custom.value) : selected;
       var msg = document.getElementById("donateMsg");
       if (!amt || amt < 1) { msg.className = "form-msg err"; msg.textContent = "Please choose or enter an amount."; return; }
+      var ppUser = (window.OVEA_PAYPAL || "").trim();
+      if (!ppUser) {
+        msg.className = "form-msg err";
+        msg.textContent = "Donations aren't connected yet. Please check back soon.";
+        return;
+      }
       msg.className = "form-msg ok";
-      msg.textContent = "Thank you for your generosity! Your $" + amt +
-        (freq && freq.value === "monthly" ? " each month" : "") +
-        " gift helps keep Ovea free and safe. (Demo, no payment taken.)";
-      e.target.reset();
-      updateLabel();
+      msg.textContent = "Taking you to PayPal to complete your $" + amt + " donation…";
+      // Open PayPal to complete the payment
+      window.location.href = "https://www.paypal.com/paypalme/" + encodeURIComponent(ppUser) + "/" + amt + "USD";
     });
     updateLabel();
   }
