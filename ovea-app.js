@@ -64,12 +64,14 @@
     var createBtn = document.getElementById("createBtn");
     if (!area) return;
     if (session && session.user) {
-      var initial = (userEmail() || "?").charAt(0).toUpperCase();
+      var isAnon = !userEmail() || session.user.is_anonymous;
+      var initial = isAnon ? "A" : userEmail().charAt(0).toUpperCase();
+      var who = isAnon ? "Signed in anonymously" : "Signed in as<br>" + esc(userEmail());
       area.innerHTML =
         '<div class="acct-wrap">' +
           '<button class="account-chip" id="acctBtn"><span class="av">' + esc(initial) + "</span> Account ▾</button>" +
           '<div class="account-menu" id="acctMenu">' +
-            '<div class="who">Signed in as<br>' + esc(userEmail()) + "</div>" +
+            '<div class="who">' + who + "</div>" +
             '<a href="index.html">Home feed</a>' +
             (window.OVEA_IS_ADMIN ? '<a href="moderation.html">Moderation queue</a>' : "") +
             '<button id="signOutBtn">Sign out</button>' +
@@ -126,6 +128,16 @@
       }).then(function (res) {
         if (res.error) setAuthMsg(res.error.message, "err");
         else setAuthMsg("Check your inbox, we sent you a sign-in link.", "ok");
+      });
+    });
+
+    var anonBtn = document.getElementById("anonBtn");
+    if (anonBtn) anonBtn.addEventListener("click", function () {
+      if (!configured) return setAuthMsg("Supabase isn't configured yet, see SETUP.md.", "err");
+      setAuthMsg("Setting you up…", "ok");
+      sb.auth.signInAnonymously().then(function (res) {
+        if (res.error) setAuthMsg(res.error.message, "err");
+        // onAuthStateChange handles the rest (UI refresh + closing the modal)
       });
     });
   }
