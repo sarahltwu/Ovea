@@ -724,3 +724,14 @@ a { color: inherit; text-decoration: none; }
 .welcome-rules .rule { padding: 8px 0; border-bottom: 1px dashed var(--line); font-size: 14px; color: var(--ink); }
 .welcome-rules .rule:last-child { border-bottom: 0; }
 .welcome-rules .rule b { color: var(--plum-deep); }
+
+/* Small floating "community rules" button */
+.rules-fab {
+  position: fixed; right: 20px; bottom: 20px; z-index: 40;
+  width: 42px; height: 42px; border-radius: 50%;
+  background: var(--white); border: 1.5px solid var(--line);
+  color: var(--plum); font-family: var(--serif); font-size: 20px; font-weight: 700;
+  cursor: pointer; box-shadow: var(--shadow-sm); display: grid; place-items: center;
+  transition: border-color .2s, transform .2s;
+}
+.rules-fab:hover { border-color: var(--rose); transform: translateY(-2px); }
