@@ -176,6 +176,27 @@
     updateLabel();
   }
 
+  /* ---------- Welcome popup (new visitors) ---------- */
+  function initWelcome() {
+    var modal = document.getElementById("welcomeModal");
+    if (!modal) return;
+    function open() { modal.classList.add("open"); }
+    function close() { modal.classList.remove("open"); localStorage.setItem("ovea_welcomed", "1"); }
+
+    // Show once for people who haven't seen it before
+    if (!localStorage.getItem("ovea_welcomed")) open();
+
+    var x = document.getElementById("welcomeClose");
+    var got = document.getElementById("welcomeGotIt");
+    if (x) x.addEventListener("click", close);
+    if (got) got.addEventListener("click", close);
+    modal.addEventListener("click", function (e) { if (e.target === modal) close(); });
+
+    // Let anyone re-open the rules from the sidebar button
+    var show = document.getElementById("showRules");
+    if (show) show.addEventListener("click", open);
+  }
+
   /* ---------- boot ---------- */
   document.addEventListener("DOMContentLoaded", function () {
     injectFooter();
@@ -186,5 +207,6 @@
     initEvents();
     initFeedback();
     initDonate();
+    initWelcome();
   });
 })();

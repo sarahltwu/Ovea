@@ -715,3 +715,12 @@ a { color: inherit; text-decoration: none; }
 .phase b { display: block; color: var(--plum-deep); font-size: 15.5px; }
 .phase .when { font-size: 12px; color: var(--sage); font-weight: 700; text-transform: uppercase; letter-spacing: .4px; }
 .phase p { margin: 5px 0 0 !important; font-size: 14.5px; color: var(--ink); line-height: 1.6; }
+
+/* Welcome / rules popup */
+.welcome-box { max-width: 440px; text-align: left; }
+.welcome-box .mark-lg, .welcome-box h2, .welcome-box .sub { text-align: center; }
+.welcome-box h2, .welcome-box .sub { margin-left: auto; margin-right: auto; }
+.welcome-rules { background: var(--blush); border-radius: 14px; padding: 16px 18px; margin: 18px 0 20px; }
+.welcome-rules .rule { padding: 8px 0; border-bottom: 1px dashed var(--line); font-size: 14px; color: var(--ink); }
+.welcome-rules .rule:last-child { border-bottom: 0; }
+.welcome-rules .rule b { color: var(--plum-deep); }

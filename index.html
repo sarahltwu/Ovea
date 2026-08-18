@@ -48,10 +48,6 @@
 
     <!-- CENTER: feed -->
     <section class="feed">
-      <div class="safe-banner">
-        <b>This is a safe space.</b> You're anonymous here. Be kind, support each other, and speak freely. Anything hurtful gets flagged and removed.
-      </div>
-
       <!-- Composer -->
       <div class="composer" id="composer">
         <div class="prompt">
@@ -100,25 +96,33 @@
     <aside class="right-rail">
       <div class="rail-sticky">
         <div class="rail-card">
-          <h3>Welcome to Ovea</h3>
-          <p>A safe space for girls and young women, a place to speak up about anything, anonymously and safely.</p>
-          <p style="margin-bottom:0">No real names. No judgment. Just real talk and real support.</p>
-        </div>
-        <div class="rail-card">
-          <h3>Community rules</h3>
-          <div class="rule"><b>1.</b><span>Be kind and respect every woman's experience.</span></div>
-          <div class="rule"><b>2.</b><span>Stay anonymous, never share info that identifies you or others.</span></div>
-          <div class="rule"><b>3.</b><span>No hate, harassment, or bullying. Ever.</span></div>
-          <div class="rule"><b>4.</b><span>Support, don't diagnose. Share experience, not medical orders.</span></div>
-          <div class="rule"><b>5.</b><span>In crisis? Visit <a href="support.html" style="color:var(--plum);font-weight:600">Get Help</a> right away.</span></div>
-        </div>
-        <div class="rail-card">
           <h3>Trending</h3>
           <div class="tag-cloud" id="trending"></div>
+        </div>
+        <div class="rail-card">
+          <button class="btn btn-ghost" id="showRules" style="width:100%;justify-content:center;padding:10px">Community rules</button>
         </div>
       </div>
     </aside>
   </main>
+
+  <!-- Welcome / rules popup (shows once for new visitors) -->
+  <div class="modal-overlay" id="welcomeModal">
+    <div class="auth-box welcome-box">
+      <button class="close" id="welcomeClose" aria-label="Close">×</button>
+      <div class="mark-lg"></div>
+      <h2>Welcome to Ovea</h2>
+      <p class="sub">A safe space for girls and young women to speak up, share, and support each other. You're anonymous here, always. No real names, no judgment.</p>
+      <div class="welcome-rules">
+        <div class="rule"><b>1.</b><span>Be kind and respect every girl's experience.</span></div>
+        <div class="rule"><b>2.</b><span>Stay anonymous. Never share info that identifies you or others.</span></div>
+        <div class="rule"><b>3.</b><span>No hate, harassment, or bullying. Ever.</span></div>
+        <div class="rule"><b>4.</b><span>Support, don't diagnose. Share experience, not medical orders.</span></div>
+        <div class="rule"><b>5.</b><span>In crisis? Visit <a href="support.html" style="color:var(--plum);font-weight:600">Get Help</a> right away.</span></div>
+      </div>
+      <button class="btn btn-primary" id="welcomeGotIt" style="width:100%;justify-content:center">Got it, let's go</button>
+    </div>
+  </div>
 
   <!-- Sign-in modal -->
   <div class="modal-overlay" id="authModal">
