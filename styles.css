@@ -490,8 +490,8 @@ a { color: inherit; text-decoration: none; }
    Community feed — Reddit-style layout for Ovea
    ============================================================ */
 .app-shell {
-  display: grid; grid-template-columns: 240px minmax(0,1fr) 300px;
-  gap: 28px; max-width: 1600px; margin: 0 auto; padding: 24px 32px;
+  display: grid; grid-template-columns: 260px minmax(0,1fr) 320px;
+  gap: 28px; width: 100%; max-width: none; margin: 0; padding: 24px 40px;
   align-items: start;
 }
 @media (max-width: 1040px){ .app-shell { grid-template-columns: 220px minmax(0,1fr); } .right-rail { display: none; } }
