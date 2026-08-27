@@ -13,7 +13,7 @@
       '<footer class="site-footer"><div class="wrap">' +
       '<div class="footer-grid">' +
       '<div><a class="brand" href="index.html"><span class="mark"></span><span class="name">Ovea</span></a>' +
-      '<p class="about">A safe, anonymous community where women speak up, share, and support each other.</p></div>' +
+      '<p class="about">A safe, anonymous community where girls speak up, share, and support each other.</p></div>' +
       '<div class="footer-col"><h4>Community</h4>' +
       '<a href="index.html">Home feed</a><a href="resources.html">Health Info</a><a href="feedback.html">Feedback</a></div>' +
       '<div class="footer-col"><h4>Support</h4>' +
@@ -22,7 +22,7 @@
       '<a href="#">Instagram</a><a href="#">TikTok</a><a href="mailto:hello@ovea.community">hello@ovea.community</a></div>' +
       "</div>" +
       '<div class="footer-bottom">' +
-      "<span>© 2026 Ovea. A space for women, by women.</span>" +
+      "<span>© 2026 Ovea. A space for girls, by girls.</span>" +
       "<span>Ovea is peer support, not medical advice. In an emergency, contact local services.</span>" +
       "</div></div></footer>";
   }
