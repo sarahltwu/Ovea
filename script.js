@@ -104,18 +104,6 @@
     });
   }
 
-  /* ---------- Events RSVP ---------- */
-  function initEvents() {
-    document.querySelectorAll(".event .rsvp").forEach(function (btn) {
-      btn.addEventListener("click", function () {
-        if (btn.classList.contains("done")) return;
-        btn.classList.add("done", "btn-ghost");
-        btn.classList.remove("btn-primary");
-        btn.textContent = "Reserved";
-      });
-    });
-  }
-
   /* ---------- Feedback ---------- */
   function initFeedback() {
     var form = document.getElementById("feedbackForm");
@@ -208,7 +196,6 @@
     initReveal();
     initNewsletter();
     initFind();
-    initEvents();
     initFeedback();
     initDonate();
     initWelcome();
