@@ -20,7 +20,8 @@
       '<a href="support.html">Get Help</a><a href="support.html">Crisis Resources</a><a href="about.html">About</a><a href="donate.html">Support Ovea</a></div>' +
       '<div class="footer-col"><h4>Connect</h4>' +
       '<a href="https://www.tiktok.com/@oveaforum" target="_blank" rel="noopener">TikTok, @oveaforum</a>' +
-      '<a href="mailto:hello@ovea.community">hello@ovea.community</a></div>' +
+      '<a href="mailto:oveaforum@gmail.com">oveaforum@gmail.com</a>' +
+      '<a href="feedback.html?type=improvement">Report a problem</a></div>' +
       "</div>" +
       '<div class="footer-bottom">' +
       "<span>© 2026 Ovea. A space for girls, by girls.</span>" +
@@ -109,17 +110,66 @@
   function initFeedback() {
     var form = document.getElementById("feedbackForm");
     if (!form) return;
-    form.addEventListener("submit", function (e) {
+    var typeSel = document.getElementById("fbType");
+
+    // Arriving from a "Report a problem" link preselects that option.
+    var wanted = new URLSearchParams(window.location.search).get("type");
+    if (wanted && typeSel) {
+      var has = Array.prototype.some.call(typeSel.options, function (o) { return o.value === wanted; });
+      if (has) typeSel.value = wanted;
+    }
+
+    // Feedback goes to the Supabase `feedback` table (see
+    // supabase/feedback-table.sql). If that isn't reachable we say so
+    // and offer email, rather than pretending the message was sent.
+    var sb = null;
+    var cfg = window.OVEA_CONFIG || {};
+    if (window.supabase && cfg.SUPABASE_URL && cfg.SUPABASE_ANON_KEY) {
+      try { sb = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY); } catch (err) { sb = null; }
+    }
+
+    function fallback(msg, text) {
+      msg.className = "form-msg err";
+      msg.innerHTML = text + ' Please email us at <a href="mailto:oveaforum@gmail.com" ' +
+        'style="color:var(--plum);font-weight:600">oveaforum@gmail.com</a>.';
+    }
+
+    form.addEventListener("submit", async function (e) {
       e.preventDefault();
       var msg = document.getElementById("fbMsg");
-      if (!document.getElementById("fbMessage").value.trim()) {
+      var body = document.getElementById("fbMessage").value.trim();
+      if (!body) {
         msg.className = "form-msg err";
         msg.textContent = "Please share a little about your idea before sending.";
         return;
       }
-      form.reset();
-      msg.className = "form-msg ok";
-      msg.textContent = "Thank you! Your feedback has been received, we read every message.";
+      var btn = form.querySelector('button[type="submit"]');
+      if (btn) { btn.disabled = true; btn.textContent = "Sending…"; }
+      msg.className = "form-msg";
+      msg.textContent = "Sending…";
+
+      function done() { if (btn) { btn.disabled = false; btn.textContent = "Send feedback"; } }
+
+      if (!sb) { fallback(msg, "We couldn't reach our server, so this didn't send."); done(); return; }
+
+      try {
+        var res = await sb.from("feedback").insert({
+          kind: typeSel ? typeSel.value : "other",
+          message: body,
+          email: document.getElementById("fbEmail").value.trim() || null,
+          page: window.location.pathname
+        });
+        if (res.error) {
+          fallback(msg, "We couldn't send that just now.");
+        } else {
+          form.reset();
+          msg.className = "form-msg ok";
+          msg.textContent = "Thank you! We got your message and we read every one.";
+        }
+      } catch (err) {
+        fallback(msg, "We couldn't send that just now.");
+      }
+      done();
     });
   }
 
