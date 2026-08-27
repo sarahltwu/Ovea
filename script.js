@@ -19,7 +19,8 @@
       '<div class="footer-col"><h4>Support</h4>' +
       '<a href="support.html">Get Help</a><a href="support.html">Crisis Resources</a><a href="about.html">About</a><a href="donate.html">Support Ovea</a></div>' +
       '<div class="footer-col"><h4>Connect</h4>' +
-      '<a href="#">Instagram</a><a href="#">TikTok</a><a href="mailto:hello@ovea.community">hello@ovea.community</a></div>' +
+      '<a href="https://www.tiktok.com/@oveaforum" target="_blank" rel="noopener">TikTok, @oveaforum</a>' +
+      '<a href="mailto:hello@ovea.community">hello@ovea.community</a></div>' +
       "</div>" +
       '<div class="footer-bottom">' +
       "<span>© 2026 Ovea. A space for girls, by girls.</span>" +
