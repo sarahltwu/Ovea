@@ -281,6 +281,7 @@
       return;
     }
     feed.innerHTML = posts.map(postHTML).join("");
+    hydrateComments(posts);
   }
 
   function postHTML(p) {
@@ -308,7 +309,7 @@
             (mine || window.OVEA_IS_ADMIN ? '<button class="p-action danger" data-delete>Delete</button>' : "") +
             (mine ? "" : '<button class="p-action" data-report>Report</button>') +
           "</div>" +
-          '<div class="comments" data-comments></div>' +
+          '<div class="comments open" data-comments></div>' +
         "</div>" +
       "</article>"
     );
@@ -341,11 +342,40 @@
     if (down) down.classList.toggle("on", val === -1);
   }
 
+  function commentCountLabel(n) {
+    return n ? (n === 1 ? "1 comment" : n + " comments") : "Comment";
+  }
+
+  /* Pull the comments for every post on screen in a single query, so the
+     replies are visible straight away instead of one click per post. */
+  async function hydrateComments(posts) {
+    if (!posts.length) return;
+    var res = await sb.from("comments").select("*")
+      .in("post_id", posts.map(function (p) { return p.id; }))
+      .order("created_at", { ascending: true });
+    var byPost = {};
+    (res.data || []).forEach(function (c) { (byPost[c.post_id] = byPost[c.post_id] || []).push(c); });
+    posts.forEach(function (p) {
+      var article = document.querySelector('.post[data-id="' + p.id + '"]');
+      if (!article) return;
+      var cs = byPost[p.id] || [];
+      renderComments(article.querySelector("[data-comments]"), cs);
+      var btn = article.querySelector(".p-action[data-toggle]");
+      if (btn) btn.textContent = commentCountLabel(cs.length);
+    });
+  }
+
   async function loadComments(article, postId) {
     var box = article.querySelector("[data-comments]");
     box.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:6px 0">Loading…</div>';
     var res = await sb.from("comments").select("*").eq("post_id", postId).order("created_at", { ascending: true });
     var cs = (res.data || []);
+    var btn = article.querySelector(".p-action[data-toggle]");
+    if (btn) btn.textContent = commentCountLabel(cs.length);
+    renderComments(box, cs);
+  }
+
+  function renderComments(box, cs) {
     var compose = userId()
       ? '<div class="c-compose"><textarea placeholder="Add a supportive comment…"></textarea>' +
         '<button class="btn btn-primary" data-addcomment style="padding:9px 16px;align-self:flex-end">Reply</button></div>' +
