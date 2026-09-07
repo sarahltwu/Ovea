@@ -304,7 +304,9 @@
           (p.body ? '<div class="post-body">' + esc(p.body) + "</div>" : "") +
           '<div class="post-actions">' +
             '<button class="p-action" data-toggle>Comments</button>' +
-            '<button class="p-action" data-report>Report</button>' +
+            (mine ? '<button class="p-action" data-edit>Edit</button>' : "") +
+            (mine || window.OVEA_IS_ADMIN ? '<button class="p-action danger" data-delete>Delete</button>' : "") +
+            (mine ? "" : '<button class="p-action" data-report>Report</button>') +
           "</div>" +
           '<div class="comments" data-comments></div>' +
         "</div>" +
@@ -378,6 +380,60 @@
     await loadComments(article, postId);
   }
 
+  /* ---------- Edit / delete your own post ---------- */
+  function cancelEdit(article) {
+    var form = article.querySelector("[data-editform]");
+    if (form) form.remove();
+    var t = article.querySelector(".post-title");
+    var b = article.querySelector(".post-body");
+    if (t) t.style.display = "";
+    if (b) b.style.display = "";
+  }
+
+  function startEdit(article, id) {
+    if (article.querySelector("[data-editform]")) return;   // already editing
+    var titleEl = article.querySelector(".post-title");
+    var bodyEl = article.querySelector(".post-body");
+    var form = document.createElement("div");
+    form.className = "edit-form";
+    form.setAttribute("data-editform", "");
+    form.innerHTML =
+      '<input type="text" data-etitle maxlength="140" value="' + esc(titleEl ? titleEl.textContent : "") + '" />' +
+      '<textarea data-ebody maxlength="2000" placeholder="Add more detail (optional)">' +
+        esc(bodyEl ? bodyEl.textContent : "") + "</textarea>" +
+      '<div class="edit-actions">' +
+        '<button class="btn btn-primary" data-savedit>Save changes</button>' +
+        '<button class="p-action" data-canceledit>Cancel</button>' +
+        '<span class="edit-msg" data-emsg></span>' +
+      "</div>";
+    if (titleEl) titleEl.style.display = "none";
+    if (bodyEl) bodyEl.style.display = "none";
+    article.querySelector(".post-main").insertBefore(form, article.querySelector(".post-actions"));
+    form.querySelector("[data-etitle]").focus();
+  }
+
+  async function saveEdit(article, id) {
+    var form = article.querySelector("[data-editform]");
+    if (!form) return;
+    var title = form.querySelector("[data-etitle]").value.trim();
+    var body = form.querySelector("[data-ebody]").value.trim();
+    var msg = form.querySelector("[data-emsg]");
+    if (!title) { msg.textContent = "Your post needs a title."; return; }
+    msg.textContent = "Saving\u2026";
+    var res = await sb.from("posts").update({ title: title, body: body }).eq("id", id).select().single();
+    if (res.error) { msg.textContent = "Couldn't save: " + res.error.message; return; }
+    await loadFeed();
+    renderTrending();
+  }
+
+  async function deletePost(article, id) {
+    if (!confirm("Delete this post for good? This can't be undone.")) return;
+    var res = await sb.from("posts").delete().eq("id", id);
+    if (res.error) { alert("Couldn't delete: " + res.error.message); return; }
+    article.remove();
+    renderTrending();
+  }
+
   async function reportContent(type, id) {
     if (!userId()) return openAuth();
     if (!confirm("Report this " + type + " to moderators?")) return;
@@ -443,6 +499,10 @@
       }
       if (e.target.closest("[data-addcomment]")) { addComment(article, id); return; }
       if (e.target.closest("[data-needauth]")) { openAuth(); return; }
+      if (e.target.closest("[data-edit]")) { startEdit(article, id); return; }
+      if (e.target.closest("[data-savedit]")) { saveEdit(article, id); return; }
+      if (e.target.closest("[data-canceledit]")) { cancelEdit(article); return; }
+      if (e.target.closest("[data-delete]")) { deletePost(article, id); return; }
       if (e.target.closest("[data-report]")) { reportContent("post", id); return; }
     });
 

@@ -737,3 +737,18 @@ a { color: inherit; text-decoration: none; }
   transition: border-color .2s, transform .2s;
 }
 .rules-fab:hover { border-color: var(--rose); transform: translateY(-2px); }
+
+/* ---------- Edit your own post ---------- */
+.p-action.danger { color: var(--rose); }
+.p-action.danger:hover { background: var(--blush-2); color: #b8456a; }
+.edit-form { display: flex; flex-direction: column; gap: 10px; margin: 4px 0 12px; }
+.edit-form input, .edit-form textarea {
+  width: 100%; font-family: var(--font); font-size: 15px; color: var(--ink);
+  padding: 10px 13px; border: 1.5px solid var(--line); border-radius: 10px; background: var(--white);
+}
+.edit-form input { font-weight: 600; }
+.edit-form textarea { min-height: 90px; resize: vertical; }
+.edit-form input:focus, .edit-form textarea:focus { outline: none; border-color: var(--plum); }
+.edit-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.edit-actions .btn { padding: 8px 16px; font-size: 14px; }
+.edit-msg { font-size: 13px; color: var(--muted); }
