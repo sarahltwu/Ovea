@@ -343,7 +343,7 @@
   }
 
   function commentCountLabel(n) {
-    return n ? (n === 1 ? "1 comment" : n + " comments") : "Comment";
+    return n === 0 ? "No comments yet" : n === 1 ? "1 comment" : n + " comments";
   }
 
   /* Pull the comments for every post on screen in a single query, so the
@@ -392,7 +392,11 @@
         '<div class="c-by">' + note + "<b>" + esc(c.author_name || "Anonymous") + "</b> · " + timeAgo(c.created_at) + "</div>" +
         '<div class="c-text">' + esc(c.body) + "</div></div>";
     }).join("");
-    box.innerHTML = compose + (list || '<div style="color:var(--muted);font-size:13px">No comments yet, be the first.</div>');
+    var wasOpen = box.querySelector("[data-clist].open") ? " open" : "";
+    box.innerHTML = compose +
+      '<div class="c-list' + wasOpen + '" data-clist>' +
+        (list || '<div style="color:var(--muted);font-size:13px">No comments yet, be the first.</div>') +
+      "</div>";
   }
 
   async function addComment(article, postId) {
@@ -408,6 +412,8 @@
     ta.disabled = false;
     if (res.error) { alert("Couldn't post comment: " + res.error.message); return; }
     await loadComments(article, postId);
+    var list = article.querySelector("[data-clist]");   // show the reply you just left
+    if (list) list.classList.add("open");
   }
 
   /* ---------- Edit / delete your own post ---------- */
@@ -517,9 +523,12 @@
         setCommunity(cid); return;
       }
       if (e.target.closest("[data-toggle]")) {
-        var box = article.querySelector("[data-comments]");
-        if (box.classList.contains("open")) box.classList.remove("open");
-        else { box.classList.add("open"); loadComments(article, id); }
+        var list = article.querySelector("[data-clist]");
+        if (list) { list.classList.toggle("open"); return; }
+        loadComments(article, id).then(function () {          // not hydrated yet
+          var l = article.querySelector("[data-clist]");
+          if (l) l.classList.add("open");
+        });
         return;
       }
       if (e.target.closest("[data-canon]")) {

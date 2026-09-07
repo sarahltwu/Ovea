@@ -752,3 +752,7 @@ a { color: inherit; text-decoration: none; }
 .edit-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .edit-actions .btn { padding: 8px 16px; font-size: 14px; }
 .edit-msg { font-size: 13px; color: var(--muted); }
+
+/* Reply box stays visible; the thread itself collapses behind the count */
+.c-list { display: none; margin-top: 4px; }
+.c-list.open { display: block; }
