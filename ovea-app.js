@@ -424,7 +424,10 @@
     }
 
     if (!posts.length) {
-      feed.innerHTML = '<div class="feed-empty">No posts here yet. Be the first to speak up.</div>';
+      feed.innerHTML = state.query
+        ? '<div class="feed-empty">Nothing matches &ldquo;' + esc(state.query) + '&rdquo;. ' +
+          '<button class="link-btn" data-clearsearch>Show all posts</button></div>'
+        : '<div class="feed-empty">No posts here yet. Be the first to speak up.</div>';
       return;
     }
     feed.innerHTML = posts.map(postHTML).join("");
@@ -692,6 +695,7 @@
     });
 
     feed.addEventListener("click", function (e) {
+      if (e.target.closest("[data-clearsearch]")) { clearSearch(); return; }
       var article = e.target.closest(".post");
       if (!article) return;
       var id = parseInt(article.getAttribute("data-id"), 10);
@@ -786,16 +790,43 @@
 
     var nav = document.getElementById("navSearch");
     if (nav) nav.addEventListener("input", function () { doSearch(nav.value); });
+    var chip = document.getElementById("filterChip");
+    if (chip) chip.addEventListener("click", function () { clearSearch(); });
   }
 
   function setCommunity(id) {
     state.community = id;
+    clearSearch(true);          // picking a community shouldn't keep a stale filter
     var title = id === "all" ? "Home" : id === "popular" ? "Popular" : (CMAP[id] || "Home");
     var t = document.getElementById("feedTitle");
     if (t) t.textContent = title;
     loadFeed();
   }
-  function doSearch(q) { state.query = q.trim(); loadFeed(); }
+
+  /* Show what the feed is filtered by, and give an obvious way out. */
+  function renderFilterChip() {
+    var chip = document.getElementById("filterChip");
+    if (!chip) return;
+    if (!state.query) { chip.style.display = "none"; return; }
+    chip.style.display = "";
+    chip.innerHTML = esc(state.query) + '<span class="fx">\u00d7</span>';
+  }
+
+  function clearSearch(skipReload) {
+    state.query = "";
+    var nav = document.getElementById("navSearch");
+    if (nav) nav.value = "";
+    renderFilterChip();
+    if (!skipReload) loadFeed();
+  }
+
+  function doSearch(q) {
+    state.query = q.trim();
+    var nav = document.getElementById("navSearch");
+    if (nav && nav.value !== state.query) nav.value = state.query;   // keep the box in sync
+    renderFilterChip();
+    loadFeed();
+  }
 
   /* ============================================================
      MODERATION PAGE
