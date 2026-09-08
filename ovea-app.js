@@ -397,7 +397,8 @@
     var flagNote = (p.hidden || p.flagged) && (mine || window.OVEA_IS_ADMIN)
       ? '<span class="flag-note">' + (p.hidden ? "Hidden, under review" : "Flagged") + "</span> " : "";
     return (
-      '<article class="post' + (mine ? " mine" : "") + '" data-id="' + p.id + '">' +
+      '<article class="post' + (mine ? " mine" : "") + '" data-id="' + p.id +
+        '" data-comm="' + esc(p.community) + '">' +
         '<div class="vote-col">' +
           '<button class="vote-btn up' + (mv === 1 ? " on" : "") + '" data-vote="1" aria-label="Upvote">▲</button>' +
           '<span class="score">' + (p.score || 0) + "</span>" +
@@ -412,7 +413,8 @@
           (p.body ? '<div class="post-body">' + esc(p.body) + "</div>" : "") +
           '<div class="post-actions">' +
             '<button class="p-action" data-toggle>Comments</button>' +
-            (mine ? '<button class="p-action" data-edit>Edit</button>' : "") +
+            (mine || window.OVEA_IS_ADMIN ? '<button class="p-action" data-edit>' +
+              (mine ? "Edit" : "Change topic") + "</button>" : "") +
             (mine || window.OVEA_IS_ADMIN ? '<button class="p-action danger" data-delete>Delete</button>' : "") +
             (mine ? "" : '<button class="p-action" data-report>Report</button>') +
           "</div>" +
@@ -533,38 +535,67 @@
     if (b) b.style.display = "";
   }
 
+  function topicOptions(current) {
+    return COMMUNITIES.map(function (c) {
+      return '<option value="' + c.id + '"' + (c.id === current ? " selected" : "") + ">" +
+        esc(c.name) + "</option>";
+    }).join("");
+  }
+
   function startEdit(article, id) {
     if (article.querySelector("[data-editform]")) return;   // already editing
+    var mine = article.classList.contains("mine");
     var titleEl = article.querySelector(".post-title");
     var bodyEl = article.querySelector(".post-body");
     var form = document.createElement("div");
     form.className = "edit-form";
     form.setAttribute("data-editform", "");
+
+    var topic = '<select data-ecomm>' + topicOptions(article.getAttribute("data-comm")) + "</select>";
+    // A moderator editing someone else's post can re-file it, but must not
+    // rewrite her words, so only the topic is offered there.
     form.innerHTML =
-      '<input type="text" data-etitle maxlength="140" value="' + esc(titleEl ? titleEl.textContent : "") + '" />' +
-      '<textarea data-ebody maxlength="2000" placeholder="Add more detail (optional)">' +
-        esc(bodyEl ? bodyEl.textContent : "") + "</textarea>" +
+      (mine
+        ? topic +
+          '<input type="text" data-etitle maxlength="140" value="' + esc(titleEl ? titleEl.textContent : "") + '" />' +
+          '<textarea data-ebody maxlength="2000" placeholder="Add more detail (optional)">' +
+            esc(bodyEl ? bodyEl.textContent : "") + "</textarea>"
+        : '<div class="edit-note">Moderator: you can move this post to another topic. Only the author can change what it says.</div>' + topic) +
       '<div class="edit-actions">' +
         '<button class="btn btn-primary" data-savedit>Save changes</button>' +
         '<button class="p-action" data-canceledit>Cancel</button>' +
         '<span class="edit-msg" data-emsg></span>' +
       "</div>";
-    if (titleEl) titleEl.style.display = "none";
-    if (bodyEl) bodyEl.style.display = "none";
+    if (mine) {
+      if (titleEl) titleEl.style.display = "none";
+      if (bodyEl) bodyEl.style.display = "none";
+    }
     article.querySelector(".post-main").insertBefore(form, article.querySelector(".post-actions"));
-    form.querySelector("[data-etitle]").focus();
+    var first = form.querySelector(mine ? "[data-etitle]" : "[data-ecomm]");
+    if (first) first.focus();
   }
 
   async function saveEdit(article, id) {
     var form = article.querySelector("[data-editform]");
     if (!form) return;
-    var title = form.querySelector("[data-etitle]").value.trim();
-    var body = form.querySelector("[data-ebody]").value.trim();
     var msg = form.querySelector("[data-emsg]");
-    if (!title) { msg.textContent = "Your post needs a title."; return; }
+    var titleEl = form.querySelector("[data-etitle]");
+    var commEl = form.querySelector("[data-ecomm]");
+    var patch = {};
+    if (commEl) patch.community = commEl.value;
+    if (titleEl) {                                  // author editing her own post
+      var title = titleEl.value.trim();
+      if (!title) { msg.textContent = "Your post needs a title."; return; }
+      patch.title = title;
+      patch.body = form.querySelector("[data-ebody]").value.trim();
+    }
     msg.textContent = "Saving\u2026";
-    var res = await sb.from("posts").update({ title: title, body: body }).eq("id", id).select().single();
+    var res = await sb.from("posts").update(patch).eq("id", id).select();
     if (res.error) { msg.textContent = "Couldn't save: " + res.error.message; return; }
+    if (!res.data || !res.data.length) {            // RLS silently matched nothing
+      msg.textContent = "You don't have permission to change this post.";
+      return;
+    }
     await loadFeed();
     renderTrending();
   }
