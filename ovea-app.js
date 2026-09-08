@@ -16,7 +16,8 @@
     { id: "relationships", name: "Friends & Relationships", count: "" },
     { id: "school",        name: "School & Stress",         count: "" },
     { id: "safety",        name: "Safety & Support",        count: "" },
-    { id: "venting",       name: "Just Venting",            count: "" }
+    { id: "venting",       name: "Just Venting",            count: "" },
+    { id: "other",         name: "Other",                   count: "" }
   ];
   var CMAP = {};
   COMMUNITIES.forEach(function (c) { CMAP[c.id] = c.name; });
