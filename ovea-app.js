@@ -58,6 +58,105 @@
   function userEmail() { return session && session.user ? session.user.email : ""; }
 
   /* ============================================================
+     NOTIFICATIONS
+     Replies other people leave on your posts. Votes can't be used:
+     the "votes read own" policy means you can only see your own.
+     ============================================================ */
+  var NOTIF_SEEN = "ovea_notif_seen";
+  var notifItems = [], notifTitles = {};
+
+  function notifSeenAt() {
+    try { return localStorage.getItem(NOTIF_SEEN) || ""; } catch (e) { return ""; }
+  }
+  function markNotifsSeen() {
+    if (!notifItems.length) return;
+    try { localStorage.setItem(NOTIF_SEEN, notifItems[0].created_at); } catch (e) {}
+  }
+
+  async function loadNotifications() {
+    var wrap = document.getElementById("notifWrap");
+    if (!wrap) return;
+    if (!userId()) { wrap.style.display = "none"; return; }
+    wrap.style.display = "";
+
+    var mine = await sb.from("posts").select("id,title").eq("user_id", userId());
+    var posts = mine.data || [];
+    if (!posts.length) { notifItems = []; notifTitles = {}; return renderNotifications(); }
+
+    notifTitles = {};
+    posts.forEach(function (p) { notifTitles[p.id] = p.title; });
+    var res = await sb.from("comments").select("*")
+      .in("post_id", posts.map(function (p) { return p.id; }))
+      .neq("user_id", userId())
+      .order("created_at", { ascending: false })
+      .limit(30);
+    notifItems = res.data || [];
+    renderNotifications();
+  }
+
+  function renderNotifications() {
+    var badge = document.getElementById("notifBadge");
+    var list = document.getElementById("notifList");
+    if (!badge || !list) return;
+    var seen = notifSeenAt();
+    var unread = notifItems.filter(function (c) { return c.created_at > seen; }).length;
+    badge.textContent = unread > 9 ? "9+" : unread;
+    badge.style.display = unread ? "" : "none";
+
+    if (!notifItems.length) {
+      list.innerHTML = '<div class="notif-empty">Nothing yet. When someone replies to one of your posts, it shows up here.</div>';
+      return;
+    }
+    list.innerHTML = notifItems.map(function (c) {
+      var isNew = c.created_at > seen;
+      return '<button class="notif-item' + (isNew ? " unread" : "") + '" data-notif="' + c.post_id + '">' +
+        '<div class="notif-line"><b>' + esc(c.author_name || "Anonymous") + "</b> replied to " +
+          "<i>" + esc(notifTitles[c.post_id] || "your post") + "</i></div>" +
+        '<div class="notif-snip">' + esc(c.body.length > 90 ? c.body.slice(0, 90) + "\u2026" : c.body) + "</div>" +
+        '<div class="notif-when">' + timeAgo(c.created_at) + "</div>" +
+      "</button>";
+    }).join("");
+  }
+
+  /* jump to the post a notification refers to and open its thread */
+  function openNotifTarget(postId) {
+    var panel = document.getElementById("notifPanel");
+    if (panel) panel.classList.remove("open");
+    var go = function () {
+      var article = document.querySelector('.post[data-id="' + postId + '"]');
+      if (!article) return false;
+      var l = article.querySelector("[data-clist]");
+      if (l) l.classList.add("open");
+      article.scrollIntoView({ behavior: "smooth", block: "center" });
+      article.classList.add("flash");
+      setTimeout(function () { article.classList.remove("flash"); }, 1600);
+      return true;
+    };
+    if (go()) return;
+    setCommunity("all");            // it may be filtered out of the current view
+    setTimeout(go, 600);
+  }
+
+  function initNotifications() {
+    var btn = document.getElementById("notifBtn");
+    var panel = document.getElementById("notifPanel");
+    if (!btn || !panel) return;
+    btn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      var opening = !panel.classList.contains("open");
+      panel.classList.toggle("open");
+      if (opening) { markNotifsSeen(); renderNotifications(); loadNotifications(); }
+    });
+    document.addEventListener("click", function (e) {
+      if (!e.target.closest("#notifWrap")) panel.classList.remove("open");
+    });
+    panel.addEventListener("click", function (e) {
+      var item = e.target.closest("[data-notif]");
+      if (item) openNotifTarget(Number(item.getAttribute("data-notif")));
+    });
+  }
+
+  /* ============================================================
      AUTH
      ============================================================ */
   function renderAccount() {
@@ -709,6 +808,7 @@
     await refreshAdminFlag();
     await loadMyVotes();
     renderAccount();
+    loadNotifications();
 
     // react to auth changes (sign in / out / magic-link redirect)
     sb.auth.onAuthStateChange(async function (_event, newSession) {
@@ -716,12 +816,14 @@
       await refreshAdminFlag();
       await loadMyVotes();
       renderAccount();
+      loadNotifications();
       closeAuth();
       if (document.getElementById("feed")) loadFeed();
       if (document.getElementById("modRoot")) initModeration();
     });
 
     initFeed();
+    initNotifications();
     initModeration();
   }
 

@@ -756,3 +756,35 @@ a { color: inherit; text-decoration: none; }
 /* Reply box stays visible; the thread itself collapses behind the count */
 .c-list { display: none; margin-top: 4px; }
 .c-list.open { display: block; }
+
+/* ---------- Notifications ---------- */
+.notif-wrap { position: relative; display: inline-flex; }
+.notif-btn { position: relative; background: none; border: 0; cursor: pointer; padding: 6px 8px; border-radius: 10px; line-height: 1; }
+.notif-btn:hover { background: var(--blush); }
+.notif-bell { font-size: 19px; }
+.notif-badge {
+  position: absolute; top: -1px; right: -2px; min-width: 18px; height: 18px; padding: 0 5px;
+  border-radius: 999px; background: var(--rose); color: var(--white);
+  font-size: 11px; font-weight: 700; line-height: 18px; text-align: center;
+  border: 2px solid var(--white); box-sizing: content-box;
+}
+.notif-panel {
+  display: none; position: absolute; top: 44px; right: 0; width: 330px; max-height: 420px; overflow-y: auto;
+  background: var(--white); border: 1px solid var(--line); border-radius: 14px;
+  box-shadow: var(--shadow-md, 0 12px 32px rgba(44,34,48,0.14)); z-index: 60; padding: 6px;
+}
+.notif-panel.open { display: block; }
+.notif-head { font-family: var(--serif); font-size: 15px; color: var(--plum-deep); padding: 10px 12px 8px; }
+.notif-empty { color: var(--muted); font-size: 13px; padding: 6px 12px 14px; line-height: 1.5; }
+.notif-item {
+  display: block; width: 100%; text-align: left; background: none; border: 0; cursor: pointer;
+  font-family: var(--font); padding: 10px 12px; border-radius: 10px;
+}
+.notif-item:hover { background: var(--blush); }
+.notif-item.unread { background: var(--blush-2); }
+.notif-item.unread:hover { background: var(--blush); }
+.notif-line { font-size: 13.5px; color: var(--ink); margin-bottom: 3px; }
+.notif-line i { color: var(--plum); font-style: normal; font-weight: 600; }
+.notif-snip { font-size: 12.5px; color: var(--muted); line-height: 1.45; }
+.notif-when { font-size: 11.5px; color: var(--muted); margin-top: 4px; }
+.post.flash { box-shadow: 0 0 0 3px var(--rose); transition: box-shadow .3s; }
