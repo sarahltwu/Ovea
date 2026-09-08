@@ -102,6 +102,8 @@
     var unread = notifItems.filter(function (c) { return c.created_at > seen; }).length;
     badge.textContent = unread > 9 ? "9+" : unread;
     badge.style.display = unread ? "" : "none";
+    var wrap = document.getElementById("notifWrap");
+    if (wrap) wrap.classList.toggle("has-unread", !!unread);
 
     if (!notifItems.length) {
       list.innerHTML = '<div class="notif-empty">Nothing yet. When someone replies to one of your posts, it shows up here.</div>';
