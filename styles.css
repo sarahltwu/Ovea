@@ -826,3 +826,5 @@ a { color: inherit; text-decoration: none; }
   padding: 10px 13px; border: 1.5px solid var(--line); border-radius: 10px; background: var(--white);
 }
 .edit-note { font-size: 13px; color: var(--muted); line-height: 1.5; }
+.cname-input { padding: 7px 11px; border: 1.5px solid var(--line); border-radius: 9px;
+  font-family: var(--font); font-size: 13px; background: var(--cream); color: var(--ink); }

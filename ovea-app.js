@@ -57,6 +57,34 @@
   function userId() { return session && session.user ? session.user.id : null; }
   function userEmail() { return session && session.user ? session.user.email : ""; }
 
+  /* Once a nickname exists, posting under it is the default and the field
+     is prefilled, so nobody retypes it. With no nickname yet, anonymous
+     stays the default rather than quietly attaching a name. */
+  function syncNameFields() {
+    var anon = document.getElementById("postAnon");
+    var name = document.getElementById("postName");
+    if (!anon || !name) return;
+    var dn = displayName();
+    anon.checked = !dn;
+    name.value = dn;
+    name.placeholder = dn ? "Display name" : "Pick a nickname, not your real name";
+    name.style.display = anon.checked ? "none" : "";
+  }
+
+  /* Nickname kept on the account itself (auth user_metadata), so it is set
+     once and follows you everywhere. No profiles column, and therefore no
+     policy that could let someone edit their own is_banned flag. */
+  function displayName() {
+    var m = session && session.user ? (session.user.user_metadata || {}) : {};
+    return (m.display_name || "").trim();
+  }
+  async function saveDisplayName(name) {
+    name = (name || "").trim().slice(0, 30);
+    if (!name || name === displayName()) return;
+    var res = await sb.auth.updateUser({ data: { display_name: name } });
+    if (!res.error && res.data && res.data.user) session.user = res.data.user;
+  }
+
   /* ============================================================
      NOTIFICATIONS
      Replies other people leave on your posts. Votes can't be used:
@@ -174,6 +202,9 @@
           '<button class="account-chip" id="acctBtn"><span class="av">' + esc(initial) + "</span> Account ▾</button>" +
           '<div class="account-menu" id="acctMenu">' +
             '<div class="who">' + who + "</div>" +
+            '<div class="who" style="border-top:1px solid var(--line);margin-top:2px;padding-top:9px">' +
+              (displayName() ? "Posting as <b>" + esc(displayName()) + "</b>" : "No nickname yet") + "</div>" +
+            '<button id="nickBtn">' + (displayName() ? "Change nickname" : "Pick a nickname") + "</button>" +
             '<a href="index.html">Home feed</a>' +
             (window.OVEA_IS_ADMIN ? '<a href="moderation.html">Moderation queue</a>' : "") +
             '<button id="signOutBtn">Sign out</button>' +
@@ -184,6 +215,15 @@
       document.addEventListener("click", function () { menu.classList.remove("open"); });
       document.getElementById("signOutBtn").addEventListener("click", function () {
         sb.auth.signOut();
+      });
+      var nickBtn = document.getElementById("nickBtn");
+      if (nickBtn) nickBtn.addEventListener("click", async function () {
+        var v = prompt("Pick a nickname to post under. It doesn't have to be your real name, and you can still post anonymously any time.", displayName());
+        if (v === null) return;
+        await saveDisplayName(v);
+        renderAccount();
+        syncNameFields();
+        if (document.getElementById("feed")) loadFeed();
       });
       if (createBtn) createBtn.textContent = "Create post";
     } else {
@@ -490,8 +530,12 @@
         '<button class="btn btn-primary" data-addcomment style="padding:9px 16px;align-self:flex-end">Reply</button></div>' +
         '<div style="display:flex;align-items:center;gap:12px;margin:-6px 0 14px;flex-wrap:wrap">' +
           '<label style="display:flex;align-items:center;gap:7px;font-size:13px;color:var(--muted);cursor:pointer">' +
-          '<input type="checkbox" data-canon checked style="width:15px;height:15px;accent-color:var(--plum)" /> Comment anonymously</label>' +
-          '<input type="text" data-cname maxlength="30" placeholder="Display name" style="display:none;padding:7px 11px;border:1.5px solid var(--line);border-radius:9px;font-family:var(--font);font-size:13px;background:var(--cream)" />' +
+          '<input type="checkbox" data-canon' + (displayName() ? "" : " checked") +
+            ' style="width:15px;height:15px;accent-color:var(--plum)" /> Comment anonymously</label>' +
+          '<input type="text" data-cname maxlength="30" value="' + esc(displayName()) +
+            '" placeholder="' + (displayName() ? "Display name" : "Pick a nickname") + '"' +
+            (displayName() ? "" : ' style="display:none"') +
+            ' class="cname-input" />' +
         "</div>"
       : '<div style="margin-bottom:12px"><button class="btn btn-ghost" data-needauth style="padding:9px 16px">Sign in to comment</button></div>';
     var list = cs.map(function (c) {
@@ -515,7 +559,8 @@
     var anonBox = article.querySelector("[data-comments] [data-canon]");
     var nameBox = article.querySelector("[data-comments] [data-cname]");
     var anon = !anonBox || anonBox.checked;
-    var authorName = anon ? null : ((nameBox && nameBox.value.trim()) || "Member");
+    var authorName = anon ? null : ((nameBox && nameBox.value.trim()) || displayName() || "Member");
+    if (!anon && authorName && authorName !== "Member") await saveDisplayName(authorName);
     ta.disabled = true;
     var res = await sb.from("comments").insert({ post_id: postId, user_id: userId(), body: text, author_name: authorName });
     ta.disabled = false;
@@ -690,6 +735,7 @@
     function openComposer() {
       if (!userId()) return openAuth();
       composerForm.classList.add("open");
+      syncNameFields();
       document.getElementById("postTitle").focus();
     }
     if (openInput) openInput.addEventListener("click", openComposer);
@@ -707,6 +753,7 @@
     var postName = document.getElementById("postName");
     if (postAnon && postName) postAnon.addEventListener("change", function () {
       postName.style.display = postAnon.checked ? "none" : "";
+      if (!postAnon.checked && !postName.value) postName.value = displayName();
     });
 
     if (composerForm) composerForm.addEventListener("submit", async function (e) {
@@ -716,7 +763,8 @@
       var body = document.getElementById("postBody").value.trim();
       var community = document.getElementById("postCommunity").value;
       var anon = document.getElementById("postAnon").checked;
-      var authorName = anon ? null : (document.getElementById("postName").value.trim() || "Member");
+      var authorName = anon ? null : (document.getElementById("postName").value.trim() || displayName() || "Member");
+      if (!anon && authorName && authorName !== "Member") await saveDisplayName(authorName);
       if (!title) return;
       if (!community) { document.getElementById("postCommunity").focus(); return; }
       var res = await sb.from("posts").insert({ user_id: userId(), community: community, title: title, body: body, author_name: authorName }).select().single();
