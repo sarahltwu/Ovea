@@ -278,9 +278,14 @@
   function renderCommunitySelect() {
     var sel = document.getElementById("postCommunity");
     if (!sel) return;
-    sel.innerHTML = COMMUNITIES.map(function (c) {
-      return '<option value="' + c.id + '">' + esc(c.name) + "</option>";
-    }).join("");
+    // Leading placeholder so a topic is an actual choice, not whatever
+    // happened to be first in the list. `required` on the <select> makes
+    // the browser block submitting until one is picked.
+    sel.innerHTML =
+      '<option value="" disabled selected>Choose a topic…</option>' +
+      COMMUNITIES.map(function (c) {
+        return '<option value="' + c.id + '">' + esc(c.name) + "</option>";
+      }).join("");
   }
   // Words too common to be interesting as a trend
   var STOP = ("the a an and or but if then of to in on at for with about from into "
@@ -682,6 +687,7 @@
       var anon = document.getElementById("postAnon").checked;
       var authorName = anon ? null : (document.getElementById("postName").value.trim() || "Member");
       if (!title) return;
+      if (!community) { document.getElementById("postCommunity").focus(); return; }
       var res = await sb.from("posts").insert({ user_id: userId(), community: community, title: title, body: body, author_name: authorName }).select().single();
       if (res.error) { alert("Couldn't post: " + res.error.message); return; }
       // author auto-upvote
