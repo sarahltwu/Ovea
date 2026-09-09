@@ -336,7 +336,19 @@
     + "can could would should will shall may might must want need know think feel feeling felt "
     + "what when where why how who which whom whose because as than then now today day days "
     + "time times people someone anyone everyone something anything nothing thing things "
-    + "go going went come came back one two her she help please thanks thank").split(/\s+/);
+    + "go going went come came back one two her she help please thanks thank "
+    // filler that otherwise trends on its own: "a lot" leaves "lot" behind
+    + "lot lots bit bits kind kinds sort sorts way ways well sure maybe actually "
+    + "basically literally honestly seriously totally kinda sorta gonna wanna "
+    + "always never ever every everybody everything anybody nobody "
+    + "make makes made making take takes took taking put puts keep keeps kept "
+    + "look looks looked looking see sees saw seen say says said tell tells told "
+    + "ask asks asked asking give gives gave let lets guess guessing "
+    + "yeah yea okay ok hey hi hello lol idk btw tbh imo "
+    + "good bad better worse best worst little big small new old "
+    + "first last next around away though although anyway anymore "
+    + "since while before after again another other others own same "
+    + "many few lately recently usually often sometimes hard easy").split(/\s+/);
   var STOPSET = {};
   STOP.forEach(function (w) { STOPSET[w] = true; });
 
