@@ -25,13 +25,60 @@
 
   /* ---------- Supabase client ---------- */
   var sb = null, configured = false;
+  /* ---------- "Stay signed in" ----------
+     Supabase keeps the session in localStorage by default, so people are
+     already remembered. What was missing is the way out of that: on a
+     family iPad or a school laptop, staying signed in to Ovea is not
+     something a girl necessarily wants. Unchecking sends the session to
+     sessionStorage instead, so closing the browser signs her out. */
+  var REMEMBER_KEY = "ovea_remember";
+
+  function rememberMe() {
+    try { return localStorage.getItem(REMEMBER_KEY) !== "0"; } catch (e) { return true; }
+  }
+  function authStore() {
+    try { return rememberMe() ? window.localStorage : window.sessionStorage; }
+    catch (e) { return window.sessionStorage; }
+  }
+  // Picks the store at call time, so flipping the checkbox takes effect
+  // without rebuilding the client.
+  var hybridStorage = {
+    getItem: function (k) {
+      try { return authStore().getItem(k); } catch (e) { return null; }
+    },
+    setItem: function (k, v) {
+      try { authStore().setItem(k, v); } catch (e) {}
+    },
+    removeItem: function (k) {
+      try { localStorage.removeItem(k); } catch (e) {}
+      try { sessionStorage.removeItem(k); } catch (e) {}
+    }
+  };
+
+  function setRememberMe(on) {
+    try { localStorage.setItem(REMEMBER_KEY, on ? "1" : "0"); } catch (e) {}
+    // move any session already saved so the choice applies right away
+    try {
+      var from = on ? sessionStorage : localStorage;
+      var to = on ? localStorage : sessionStorage;
+      Object.keys(from).forEach(function (k) {
+        if (k.indexOf("sb-") === 0 && k.indexOf("auth-token") !== -1) {
+          to.setItem(k, from.getItem(k));
+          from.removeItem(k);
+        }
+      });
+    } catch (e) {}
+  }
+
   function initClient() {
     var cfg = window.OVEA_CONFIG || {};
     configured = cfg.SUPABASE_URL && cfg.SUPABASE_URL.indexOf("YOUR_") === -1 &&
                  cfg.SUPABASE_ANON_KEY && cfg.SUPABASE_ANON_KEY.indexOf("YOUR_") === -1 &&
                  window.supabase && typeof window.supabase.createClient === "function";
     if (configured) {
-      sb = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
+      sb = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY, {
+        auth: { persistSession: true, autoRefreshToken: true, storage: hybridStorage }
+      });
     }
     return configured;
   }
@@ -242,6 +289,11 @@
   }
 
   function initAuthModal() {
+    var rm = document.getElementById("rememberMe");
+    if (rm) {
+      rm.checked = rememberMe();
+      rm.addEventListener("change", function () { setRememberMe(rm.checked); });
+    }
     var modal = document.getElementById("authModal");
     if (!modal) return;
     modal.addEventListener("click", function (e) { if (e.target === modal) closeAuth(); });
