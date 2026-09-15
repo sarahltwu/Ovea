@@ -58,7 +58,10 @@ insert into public.banned_words(word) values
   -- ---- spam / scams -------------------------------------------
   ('onlyfans'), ('only fans'), ('cashapp'), ('venmo me'),
   ('crypto'), ('bitcoin'), ('free gift card'), ('click my link'),
-  ('promo code'), ('dm for promo')
+  ('promo code'), ('dm for promo'),
+
+  -- ---- added by request -------------------------------------
+  ('hu')
 
 on conflict do nothing;
 
