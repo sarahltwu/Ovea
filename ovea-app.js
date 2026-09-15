@@ -608,8 +608,10 @@
     var list = cs.map(function (c) {
       var mine = userId() && c.user_id === userId();
       var note = (c.hidden || c.flagged) && (mine || window.OVEA_IS_ADMIN) ? '<span class="flag-note">' + (c.hidden ? "Hidden, under review" : "Flagged") + "</span> " : "";
-      return '<div class="comment' + (mine ? " mine" : "") + '">' +
-        '<div class="c-by">' + note + "<b>" + esc(c.author_name || "Anonymous") + "</b> · " + timeAgo(c.created_at) + "</div>" +
+      var canDelete = mine || window.OVEA_IS_ADMIN;
+      return '<div class="comment' + (mine ? " mine" : "") + '" data-cid="' + c.id + '">' +
+        '<div class="c-by">' + note + "<b>" + esc(c.author_name || "Anonymous") + "</b> · " + timeAgo(c.created_at) +
+          (canDelete ? '<button class="c-delete" data-cdelete>Delete</button>' : "") + "</div>" +
         '<div class="c-text">' + esc(c.body) + "</div></div>";
     }).join("");
     var wasOpen = box.querySelector("[data-clist].open") ? " open" : "";
@@ -712,6 +714,19 @@
     renderTrending();
   }
 
+  async function deleteComment(article, postId, row) {
+    if (!row) return;
+    if (!confirm("Delete this comment for good? This can't be undone.")) return;
+    var cid = Number(row.getAttribute("data-cid"));
+    var res = await sb.from("comments").delete().eq("id", cid).select();
+    if (res.error) { alert("Couldn't delete: " + res.error.message); return; }
+    if (!res.data || !res.data.length) {           // RLS silently matched nothing
+      alert("You don't have permission to delete this comment.");
+      return;
+    }
+    await loadComments(article, postId);           // keeps the thread open and refreshes the count
+  }
+
   async function deletePost(article, id) {
     if (!confirm("Delete this post for good? This can't be undone.")) return;
     var res = await sb.from("posts").delete().eq("id", id);
@@ -793,6 +808,8 @@
       if (e.target.closest("[data-savedit]")) { saveEdit(article, id); return; }
       if (e.target.closest("[data-canceledit]")) { cancelEdit(article); return; }
       if (e.target.closest("[data-delete]")) { deletePost(article, id); return; }
+      var cdel = e.target.closest("[data-cdelete]");
+      if (cdel) { deleteComment(article, id, cdel.closest("[data-cid]")); return; }
       if (e.target.closest("[data-report]")) { reportContent("post", id); return; }
     });
 

@@ -857,3 +857,13 @@ a { color: inherit; text-decoration: none; }
   display: block; font-style: normal; font-size: 12px; font-weight: 400;
   color: var(--muted); line-height: 1.45; margin-top: 3px;
 }
+
+/* Delete on a comment, for its author or a moderator */
+.c-delete {
+  background: none; border: 0; cursor: pointer; margin-left: 8px; padding: 1px 6px; border-radius: 6px;
+  font-family: var(--font); font-size: 12px; font-weight: 600; color: var(--rose);
+  opacity: 0; transition: opacity .15s, background .15s;
+}
+.comment:hover .c-delete, .c-delete:focus-visible { opacity: 1; }
+.c-delete:hover { background: var(--blush-2); color: #b8456a; }
+@media (hover: none) { .c-delete { opacity: 1; } }  /* phones have no hover */
