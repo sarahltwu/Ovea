@@ -9,6 +9,7 @@
 
   /* ---------- Communities (static catalog) ---------- */
   var COMMUNITIES = [
+    { id: "story",         name: "My Story",                count: "" },
     { id: "periods",       name: "Periods & Cycles",        count: "" },
     { id: "body",          name: "Body & Puberty",          count: "" },
     { id: "mental",        name: "Mental Health",           count: "" },
