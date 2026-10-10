@@ -520,8 +520,8 @@
             '<span class="pill" data-jump="' + p.community + '">' + esc(CMAP[p.community] || p.community) + "</span>" +
             "<span>· by " + esc(p.author_name || "Anonymous") + " ·</span><span>" + timeAgo(p.created_at) + "</span>" +
           "</div>" +
-          '<h3 class="post-title" data-toggle>' + esc(p.title) + "</h3>" +
-          (p.body ? '<div class="post-body">' + esc(p.body) + "</div>" : "") +
+          (p.title ? '<h3 class="post-title" data-toggle>' + esc(p.title) + "</h3>" : "") +
+          (p.body ? '<div class="post-body' + (p.title ? "" : " lead") + '">' + esc(p.body) + "</div>" : "") +
           '<div class="post-actions">' +
             '<button class="p-action" data-toggle>Comments</button>' +
             (mine || window.OVEA_IS_ADMIN ? '<button class="p-action" data-edit>' +
@@ -703,9 +703,10 @@
     if (commEl) patch.community = commEl.value;
     if (titleEl) {                                  // author editing her own post
       var title = titleEl.value.trim();
-      if (!title) { msg.textContent = "Your post needs a title."; return; }
+      var newBody = form.querySelector("[data-ebody]").value.trim();
+      if (!title && !newBody) { msg.textContent = "Add a title or something in the body."; return; }
       patch.title = title;
-      patch.body = form.querySelector("[data-ebody]").value.trim();
+      patch.body = newBody;
     }
     msg.textContent = "Saving\u2026";
     var res = await sb.from("posts").update(patch).eq("id", id).select();
@@ -854,7 +855,7 @@
       var anon = document.getElementById("postAnon").checked;
       var authorName = anon ? null : (document.getElementById("postName").value.trim() || displayName() || "Member");
       if (!anon && authorName && authorName !== "Member") await saveDisplayName(authorName);
-      if (!title) return;
+      if (!title && !body) return;          // needs words, in either field
       if (!community) { document.getElementById("postCommunity").focus(); return; }
       var res = await sb.from("posts").insert({ user_id: userId(), community: community, title: title, body: body, author_name: authorName }).select().single();
       if (res.error) { alert("Couldn't post: " + res.error.message); return; }

@@ -872,3 +872,6 @@ a { color: inherit; text-decoration: none; }
   background: var(--blush); border-radius: 12px;
   font-size: 14px; line-height: 1.55; color: var(--ink);
 }
+
+/* A post with no title: the body carries it instead */
+.post-body.lead { font-size: 15.5px; color: var(--ink); }
