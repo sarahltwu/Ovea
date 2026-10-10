@@ -10,7 +10,7 @@
   /* ---------- Communities (static catalog) ---------- */
   var COMMUNITIES = [
     { id: "story",         name: "My Story",                count: "Every girl has one",
-      intro: "Every girl has a story worth telling. Yours doesn't have to be big, or finished, or make sense yet. Share as much or as little as you want, with your name or without it." },
+      intro: "Every girl has a story worth telling. Share as much or as little of yours as you like, with your name or without it." },
     { id: "periods",       name: "Periods & Cycles",        count: "" },
     { id: "body",          name: "Body & Puberty",          count: "" },
     { id: "mental",        name: "Mental Health",           count: "" },
