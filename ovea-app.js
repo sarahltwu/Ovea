@@ -10,7 +10,7 @@
   /* ---------- Communities (static catalog) ---------- */
   var COMMUNITIES = [
     { id: "story",         name: "My Story",                count: "Every girl has one",
-      intro: "Every girl has a story worth telling. Share as much or as little of yours as you like, with your name or without it." },
+      intro: "Every girl has a story and deserves a place to tell it! Share as much as you like, with your name or without it <span style='color:var(--rose)'>&#9829;</span>" },
     { id: "periods",       name: "Periods & Cycles",        count: "" },
     { id: "body",          name: "Body & Puberty",          count: "" },
     { id: "mental",        name: "Mental Health",           count: "" },
@@ -888,7 +888,7 @@
     var intro = document.getElementById("feedIntro");
     if (intro) {
       var c = COMMUNITIES.filter(function (x) { return x.id === id; })[0];
-      intro.textContent = (c && c.intro) || "";
+      intro.innerHTML = (c && c.intro) || "";
       intro.style.display = c && c.intro ? "" : "none";
     }
     loadFeed();
