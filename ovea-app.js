@@ -676,7 +676,7 @@
       (mine
         ? topic +
           '<input type="text" data-etitle maxlength="140" value="' + esc(titleEl ? titleEl.textContent : "") + '" />' +
-          '<textarea data-ebody maxlength="2000" placeholder="Add more detail (optional)">' +
+          '<textarea data-ebody maxlength="2000" placeholder="What do you want to say?">' +
             esc(bodyEl ? bodyEl.textContent : "") + "</textarea>"
         : '<div class="edit-note">Moderator: you can move this post to another topic. Only the author can change what it says.</div>' + topic) +
       '<div class="edit-actions">' +
@@ -704,7 +704,7 @@
     if (titleEl) {                                  // author editing her own post
       var title = titleEl.value.trim();
       var newBody = form.querySelector("[data-ebody]").value.trim();
-      if (!title && !newBody) { msg.textContent = "Add a title or something in the body."; return; }
+      if (!newBody) { msg.textContent = "A post needs something written in it."; return; }
       patch.title = title;
       patch.body = newBody;
     }
@@ -855,7 +855,7 @@
       var anon = document.getElementById("postAnon").checked;
       var authorName = anon ? null : (document.getElementById("postName").value.trim() || displayName() || "Member");
       if (!anon && authorName && authorName !== "Member") await saveDisplayName(authorName);
-      if (!title && !body) return;          // needs words, in either field
+      if (!body) { document.getElementById("postBody").focus(); return; }   // the post itself
       if (!community) { document.getElementById("postCommunity").focus(); return; }
       var res = await sb.from("posts").insert({ user_id: userId(), community: community, title: title, body: body, author_name: authorName }).select().single();
       if (res.error) { alert("Couldn't post: " + res.error.message); return; }
