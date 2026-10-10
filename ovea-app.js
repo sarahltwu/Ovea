@@ -9,7 +9,8 @@
 
   /* ---------- Communities (static catalog) ---------- */
   var COMMUNITIES = [
-    { id: "story",         name: "My Story",                count: "" },
+    { id: "story",         name: "My Story",                count: "Every girl has one",
+      intro: "Every girl has a story worth telling. Yours doesn't have to be dramatic, or finished, or tied up neatly. Share as much or as little as you want, with your name or without it." },
     { id: "periods",       name: "Periods & Cycles",        count: "" },
     { id: "body",          name: "Body & Puberty",          count: "" },
     { id: "mental",        name: "Mental Health",           count: "" },
@@ -364,7 +365,9 @@
     COMMUNITIES.forEach(function (c) {
       html += '<button class="c-item" data-community="' + c.id + '">' +
         '<span class="c-dot"></span><span class="c-meta"><span class="c-name">' +
-        esc(c.name) + "</span></span></button>";
+        esc(c.name) + "</span>" +
+        (c.count ? '<span class="c-count">' + esc(c.count) + "</span>" : "") +
+        "</span></button>";
     });
     el.innerHTML = html;
   }
@@ -882,6 +885,12 @@
     var title = id === "all" ? "Home" : id === "popular" ? "Popular" : (CMAP[id] || "Home");
     var t = document.getElementById("feedTitle");
     if (t) t.textContent = title;
+    var intro = document.getElementById("feedIntro");
+    if (intro) {
+      var c = COMMUNITIES.filter(function (x) { return x.id === id; })[0];
+      intro.textContent = (c && c.intro) || "";
+      intro.style.display = c && c.intro ? "" : "none";
+    }
     loadFeed();
   }
 
